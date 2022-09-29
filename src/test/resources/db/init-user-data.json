@@ -1,0 +1,37 @@
+{
+  "0": {
+    "id": 0,
+    "name": "Андрей",
+    "email": "andrey_k@yandex.ru"
+  },
+  "1": {
+    "id": 1,
+    "name": "Игорь",
+    "email": "igoriok@mail.ru"
+  },
+  "2": {
+    "id": 2,
+    "name": "Анастасия",
+    "email": "nusha.from.moscow@google.com"
+  },
+  "3": {
+    "id": 3,
+    "name": "Виктория",
+    "email": "flawless_victory@ya.ru"
+  },
+  "5": {
+    "id": 5,
+    "name": "Игорь",
+    "email": "beer_lover@google.com"
+  },
+  "6": {
+    "id": 6,
+    "name": "Степан",
+    "email": "stepan.climashin@mail.com"
+  },
+  "7": {
+    "id": 7,
+    "name": "Марк",
+    "email": "markdown@github.com"
+  }
+}

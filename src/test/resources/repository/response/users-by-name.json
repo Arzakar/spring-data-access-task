@@ -1,0 +1,37 @@
+[
+  {
+    "id": 0,
+    "name": "Андрей",
+    "email": "andrey_k@yandex.ru"
+  },
+  {
+    "id": 1,
+    "name": "Андрей",
+    "email": "andry_aa@mail.ru"
+  },
+  {
+    "id": 2,
+    "name": "Андрей",
+    "email": "super_driver@google.com"
+  },
+  {
+    "id": 3,
+    "name": "Андрей",
+    "email": "web_searcher@ya.ru"
+  },
+  {
+    "id": 5,
+    "name": "Андрей",
+    "email": "the_best_andrey@google.com"
+  },
+  {
+    "id": 6,
+    "name": "Андрей",
+    "email": "nothing@mail.com"
+  },
+  {
+    "id": 7,
+    "name": "Андрей",
+    "email": "not_andrey@github.com"
+  }
+]

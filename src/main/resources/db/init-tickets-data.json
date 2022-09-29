@@ -1,0 +1,58 @@
+{
+  "0": {
+    "id": 0,
+    "eventId": 2,
+    "userId": 1,
+    "category": "BAR",
+    "place": 1
+  },
+  "1": {
+    "id": 1,
+    "eventId": 2,
+    "userId": 3,
+    "category": "STANDARD",
+    "place": 3
+  },
+  "2": {
+    "id": 2,
+    "eventId": 2,
+    "userId": 5,
+    "category": "PREMIUM",
+    "place": 10
+  },
+  "3": {
+    "id": 3,
+    "eventId": 4,
+    "userId": 3,
+    "category": "STANDARD",
+    "place": 15
+  },
+  "4": {
+    "id": 4,
+    "eventId": 4,
+    "userId": 6,
+    "category": "STANDARD",
+    "place": 12
+  },
+  "5": {
+    "id": 5,
+    "eventId": 5,
+    "userId": 0,
+    "category": "STANDARD",
+    "place": 11
+  },
+  "6": {
+    "id": 6,
+    "eventId": 5,
+    "userId": 6,
+    "category": "PREMIUM",
+    "place": 8
+  },
+  "7": {
+    "id": 7,
+    "eventId": 0,
+    "userId": 0,
+    "category": "STANDARD",
+    "place": 1
+  }
+}
