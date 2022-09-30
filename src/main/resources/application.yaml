@@ -1,6 +1,10 @@
 server:
   port: 8080
 
+spring:
+  application:
+    name: spring-data-access-task
+
 data:
   eventDatabase:
     initDataFilePath: db\init-events-data.json
