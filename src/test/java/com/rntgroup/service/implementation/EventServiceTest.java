@@ -13,6 +13,7 @@ import com.rntgroup.repository.EventRepository;
 import com.rntgroup.repository.util.Page;
 import com.rntgroup.repository.util.SearchResult;
 
+import com.rntgroup.service.EventService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,13 +26,13 @@ import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-class EventServiceImplTest {
+class EventServiceTest {
 
     @Mock
     private EventRepository eventRepository;
 
     @InjectMocks
-    private EventServiceImpl eventService;
+    private EventService eventService;
 
     @Test
     @DisplayName("Должен сохранить Event в БД и вернуть сохранённый объект")

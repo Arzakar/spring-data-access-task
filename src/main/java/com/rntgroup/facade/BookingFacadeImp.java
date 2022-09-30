@@ -8,14 +8,19 @@ import com.rntgroup.service.TicketService;
 import com.rntgroup.service.UserService;
 
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+@Component
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BookingFacadeImp implements BookingFacade {
 
@@ -24,14 +29,6 @@ public class BookingFacadeImp implements BookingFacade {
     EventService eventService;
     UserService userService;
     TicketService ticketService;
-
-    public BookingFacadeImp(EventService eventService,
-                            UserService userService,
-                            TicketService ticketService) {
-        this.eventService = eventService;
-        this.userService = userService;
-        this.ticketService = ticketService;
-    }
 
     @Override
     public Event getEventById(long eventId) {

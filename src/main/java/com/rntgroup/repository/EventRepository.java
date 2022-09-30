@@ -7,16 +7,20 @@ import com.rntgroup.repository.util.SearchResult;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Component
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventRepository extends AbstractRepository<Event, Long> {
 
     static final Logger LOG = LoggerFactory.getLogger(EventRepository.class.getSimpleName());

@@ -14,6 +14,7 @@ import com.rntgroup.repository.TicketRepository;
 
 import com.rntgroup.repository.util.Page;
 import com.rntgroup.repository.util.SearchResult;
+import com.rntgroup.service.TicketService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,13 +26,13 @@ import java.util.Date;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-class TicketServiceImplTest {
+class TicketServiceTest {
 
     @Mock
     private TicketRepository ticketRepository;
 
     @InjectMocks
-    private TicketServiceImpl ticketService;
+    private TicketService ticketService;
 
     @Test
     @DisplayName("Должен сохранить Ticket в БД и вернуть сохранённый объект")

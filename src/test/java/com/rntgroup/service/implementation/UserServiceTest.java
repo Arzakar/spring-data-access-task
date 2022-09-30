@@ -11,6 +11,7 @@ import com.rntgroup.repository.UserRepository;
 
 import com.rntgroup.repository.util.Page;
 import com.rntgroup.repository.util.SearchResult;
+import com.rntgroup.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,13 +23,13 @@ import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceImplTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
 
     @InjectMocks
-    private UserServiceImpl userService;
+    private UserService userService;
 
     @Test
     @DisplayName("Должен сохранить User в БД и вернуть сохранённый объект")
