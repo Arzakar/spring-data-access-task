@@ -11,8 +11,7 @@ import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
 
 import lombok.Setter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.io.ClassPathResource;
@@ -24,9 +23,9 @@ import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
+@Slf4j
 public class CustomBeanPostProcessor implements BeanPostProcessor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CustomBeanPostProcessor.class.getName());
     private final ObjectMapper objectMapper = new ObjectMapper().setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
 
     @Setter
@@ -43,23 +42,23 @@ public class CustomBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        LOG.debug("Bean with name '{}' successfully created", beanName);
+        log.debug("Bean with name '{}' successfully created", beanName);
 
         Class<?> beanClass = bean.getClass();
 
         if (beanClass.equals(EventDatabase.class)) {
             loadEventData(bean);
-            LOG.debug("Data loaded successfully in {} from {}", beanClass.getSimpleName(), eventDataFilePath);
+            log.debug("Data loaded successfully in {} from {}", beanClass.getSimpleName(), eventDataFilePath);
         }
 
         if (beanClass.equals(TicketDatabase.class)) {
             loadTicketData(bean);
-            LOG.debug("Data loaded successfully in {} from {}", beanClass.getSimpleName(), ticketDataFilePath);
+            log.debug("Data loaded successfully in {} from {}", beanClass.getSimpleName(), ticketDataFilePath);
         }
 
         if (beanClass.equals(UserDatabase.class)) {
             loadUserData(bean);
-            LOG.debug("Data loaded successfully in {} from {}", beanClass.getSimpleName(), userDataFilePath);
+            log.debug("Data loaded successfully in {} from {}", beanClass.getSimpleName(), userDataFilePath);
         }
 
         return bean;
