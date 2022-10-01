@@ -1,5 +1,6 @@
 package com.rntgroup.facade;
 
+import com.rntgroup.enumerate.Category;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
@@ -112,7 +113,7 @@ public interface BookingFacade {
      * @return Booked ticket object.
      * @throws java.lang.IllegalStateException if this place has already been booked.
      */
-    Ticket bookTicket(long userId, long eventId, int place, Ticket.Category category);
+    Ticket bookTicket(long userId, long eventId, int place, Category category);
 
     /**
      * Get all booked tickets for specified user. Tickets should be sorted by event date in descending order.

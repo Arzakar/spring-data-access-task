@@ -1,5 +1,14 @@
 package com.rntgroup.facade;
 
+import com.rntgroup.dto.xml.EventXmlDto;
+import com.rntgroup.dto.xml.EventXmlDtoList;
+import com.rntgroup.dto.xml.TicketXmlDto;
+import com.rntgroup.dto.xml.TicketXmlDtoList;
+import com.rntgroup.dto.xml.UserXmlDtoList;
+import com.rntgroup.enumerate.Category;
+import com.rntgroup.mapper.EventMapper;
+import com.rntgroup.mapper.TicketMapper;
+import com.rntgroup.mapper.UserMapper;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
@@ -7,11 +16,21 @@ import com.rntgroup.service.EventService;
 import com.rntgroup.service.TicketService;
 import com.rntgroup.service.UserService;
 
+import com.rntgroup.util.FileReader;
+import com.rntgroup.util.MarshallerWrapper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import java.util.Date;
 import java.util.List;
@@ -26,6 +45,11 @@ public class BookingFacadeImp implements BookingFacade {
     EventService eventService;
     UserService userService;
     TicketService ticketService;
+
+    EventMapper eventMapper;
+    UserMapper userMapper;
+    TicketMapper ticketMapper;
+    MarshallerWrapper marshallerWrapper;
 
     @Override
     public Event getEventById(long eventId) {
@@ -103,7 +127,7 @@ public class BookingFacadeImp implements BookingFacade {
     }
 
     @Override
-    public Ticket bookTicket(long userId, long eventId, int place, Ticket.Category category) {
+    public Ticket bookTicket(long userId, long eventId, int place, Category category) {
         log.info("Method {}#bookTicket was called with params: userId = {}, eventId = {}, place = {}, category = {}",
                 this.getClass().getSimpleName(), userId, eventId, place, category);
         Ticket ticket = new Ticket(0L, eventId, userId, category, place);
@@ -128,5 +152,28 @@ public class BookingFacadeImp implements BookingFacade {
     public boolean cancelTicket(long ticketId) {
         log.info("Method {}#cancelTicket was called with param: ticketId = {}", this.getClass().getSimpleName(), ticketId);
         return Objects.nonNull(ticketService.deleteById(ticketId));
+    }
+
+    @PostConstruct
+    public void preloadTickets() throws IOException {
+        InputStream usersInputStream = new ByteArrayInputStream(FileReader.readResourceAsString("init-data/users.xml").getBytes());
+        UserXmlDtoList users = marshallerWrapper.unmarshall(usersInputStream, UserXmlDtoList.class);
+        users.getUsers().stream()
+                .map(userMapper::toModel)
+                .forEach(userService::create);
+
+        InputStream eventsInputStream = new ByteArrayInputStream(FileReader.readResourceAsString("init-data/events.xml").getBytes());
+        EventXmlDtoList events = marshallerWrapper.unmarshall(eventsInputStream, EventXmlDtoList.class);
+        events.getEvents().stream()
+                .map(eventMapper::toModel)
+                .forEach(eventService::create);
+
+        InputStream ticketsInputStream = new ByteArrayInputStream(FileReader.readResourceAsString("init-data/tickets.xml").getBytes());
+        TicketXmlDtoList tickets = marshallerWrapper.unmarshall(ticketsInputStream, TicketXmlDtoList.class);
+        tickets.getTickets().stream()
+                .map(ticketMapper::toModel)
+                .forEach(ticketService::create);
+
+        System.out.println(tickets);
     }
 }

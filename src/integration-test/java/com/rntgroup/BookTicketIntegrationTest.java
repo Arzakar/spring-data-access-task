@@ -1,7 +1,7 @@
 package com.rntgroup;
 
-import static com.rntgroup.model.Ticket.Category.PREMIUM;
-import static com.rntgroup.model.Ticket.Category.STANDARD;
+import static com.rntgroup.enumerate.Category.PREMIUM;
+import static com.rntgroup.enumerate.Category.STANDARD;
 import static java.util.Calendar.OCTOBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @IntegrationTest
-public class BookTicketIntegrationTest {
+class BookTicketIntegrationTest {
 
     @Autowired
     private BookingFacade bookingFacade;

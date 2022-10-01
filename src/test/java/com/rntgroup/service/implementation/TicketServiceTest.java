@@ -7,6 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.rntgroup.enumerate.Category;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
@@ -37,7 +38,7 @@ class TicketServiceTest {
     @Test
     @DisplayName("Должен сохранить Ticket в БД и вернуть сохранённый объект")
     void shouldCreateTicket() {
-        Ticket testTicket = new Ticket(0L, 0L, 0L, Ticket.Category.BAR, 0);
+        Ticket testTicket = new Ticket(0L, 0L, 0L, Category.BAR, 0);
 
         when(ticketRepository.existByPlace(any(Ticket.class))).thenReturn(false);
         when(ticketRepository.save(any(Ticket.class))).thenReturn(testTicket);
@@ -52,7 +53,7 @@ class TicketServiceTest {
     void shouldThrowExceptionBecauseThisPlaceAlreadyExist() {
         IllegalStateException expectedException = new IllegalStateException("Ticket with place = 0 already exist");
 
-        Ticket testTicket = new Ticket(0L, 0L, 0L, Ticket.Category.BAR, 0);
+        Ticket testTicket = new Ticket(0L, 0L, 0L, Category.BAR, 0);
 
         when(ticketRepository.existByPlace(any(Ticket.class))).thenReturn(true);
 
@@ -66,8 +67,8 @@ class TicketServiceTest {
     @DisplayName("Должен вернуть список, содержащий Tickets с одинаковыми eventId с определённой страницы")
     void shouldReturnTicketsByEvent() {
         Event testEvent = new Event(0L, "TestEvent", new Date());
-        List<Ticket> testTickets = List.of(new Ticket(0L, 0L, 0L, Ticket.Category.BAR, 0),
-                new Ticket(1L, 0L, 1L, Ticket.Category.BAR, 1));
+        List<Ticket> testTickets = List.of(new Ticket(0L, 0L, 0L, Category.BAR, 0),
+                new Ticket(1L, 0L, 1L, Category.BAR, 1));
 
         when(ticketRepository.findByEventId(any(Long.class), any(Page.class)))
                 .thenReturn(new SearchResult<Ticket>().setContent(testTickets).setPage(Page.of(2, 1)));
@@ -80,8 +81,8 @@ class TicketServiceTest {
     @DisplayName("Должен вернуть список, содержащий Tickets с одинаковыми userId с определённой страницы")
     void shouldReturnTicketsByUser() {
         User testUser = new User(0L, "TestUser", "test.email@test.com");
-        List<Ticket> testTickets = List.of(new Ticket(0L, 0L, 0L, Ticket.Category.BAR, 0),
-                new Ticket(1L, 1L, 0L, Ticket.Category.BAR, 0));
+        List<Ticket> testTickets = List.of(new Ticket(0L, 0L, 0L, Category.BAR, 0),
+                new Ticket(1L, 1L, 0L, Category.BAR, 0));
 
         when(ticketRepository.findByUserId(any(Long.class), any(Page.class)))
                 .thenReturn(new SearchResult<Ticket>().setContent(testTickets).setPage(Page.of(2, 1)));
@@ -93,7 +94,7 @@ class TicketServiceTest {
     @Test
     @DisplayName("Должен удалить Ticket из БД и вернуть удалённый объект")
     void shouldDeleteTicketById() {
-        Ticket testTicket = new Ticket(0L, 0L, 0L, Ticket.Category.BAR, 0);
+        Ticket testTicket = new Ticket(0L, 0L, 0L, Category.BAR, 0);
 
         when(ticketRepository.deleteById(any(Long.class))).thenReturn(testTicket);
 

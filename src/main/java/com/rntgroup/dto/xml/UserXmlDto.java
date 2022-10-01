@@ -1,19 +1,20 @@
-package com.rntgroup.dto;
+package com.rntgroup.dto.xml;
 
-import com.rntgroup.enumerate.Category;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 @Data
 @Accessors(chain = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BookTicketRequestDto {
+public class UserXmlDto {
 
-    long userId;
-    long eventId;
-    int place;
-    Category category;
+    Long id;
+    String name;
+    String email;
 
 }

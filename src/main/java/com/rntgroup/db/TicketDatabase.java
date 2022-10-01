@@ -5,6 +5,7 @@ import com.rntgroup.model.Ticket;
 
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -20,13 +21,14 @@ import java.util.stream.Collectors;
 @Component
 @Getter
 @Setter
+@RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TicketDatabase extends AbstractDatabase<Long, Ticket> {
 
     Map<Long, Ticket> data = new HashMap<>();
 
-    UserDatabase userDatabase;
-    EventDatabase eventDatabase;
+    final UserDatabase userDatabase;
+    final EventDatabase eventDatabase;
 
     public List<Ticket> selectByEventId(long eventId) {
         log.debug("Method {}#selectByEventId was called with param: eventId = {}", this.getClass().getSimpleName(), eventId);

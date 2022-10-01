@@ -1,5 +1,6 @@
 package com.rntgroup.model;
 
+import com.rntgroup.enumerate.Category;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -24,9 +25,4 @@ public class Ticket implements Entity<Long> {
     Category category;
     int place;
 
-    public enum Category {
-        STANDARD,
-        PREMIUM,
-        BAR
-    }
 }
