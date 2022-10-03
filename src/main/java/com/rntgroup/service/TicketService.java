@@ -1,5 +1,6 @@
 package com.rntgroup.service;
 
+import com.rntgroup.exception.BadRequestException;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
@@ -29,7 +30,7 @@ public class TicketService {
     public Ticket create(Ticket ticket) {
         log.debug("Method {}#create was called with param: ticket = {}", this.getClass().getSimpleName(), ticket);
         if (ticketRepository.existByPlace(ticket)) {
-            var error = new IllegalStateException(String.format("Ticket with place = %d already exist", ticket.getPlace()));
+            var error = new BadRequestException(String.format("Ticket with place = %d already exist", ticket.getPlace()));
             log.error("Method {}#create returned error with message: {}", this.getClass().getSimpleName(), error.getMessage());
             throw error;
         }

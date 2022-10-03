@@ -1,4 +1,4 @@
-package com.rntgroup.service.implementation;
+package com.rntgroup.service;
 
 import static java.util.Calendar.SEPTEMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.rntgroup.TestUtil;
+import com.rntgroup.exception.NotFoundException;
 import com.rntgroup.model.Event;
 import com.rntgroup.repository.EventRepository;
 import com.rntgroup.repository.util.Page;
@@ -59,11 +60,11 @@ class EventServiceTest {
     @Test
     @DisplayName("Должен выбросить исключение, т.к. Event с заданным id не найден")
     void shouldThrowExceptionBecauseEventByIdNotFound() {
-        RuntimeException expectedException = new RuntimeException("Event with id = 0 not found");
+        NotFoundException expectedException = new NotFoundException("Event with id = 0 not found");
 
         when(eventRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> eventService.findById(0L));
+        NotFoundException thrown = assertThrows(NotFoundException.class, () -> eventService.findById(0L));
         verify(eventRepository).findById(0L);
         assertEquals(expectedException.getMessage(), thrown.getMessage());
     }

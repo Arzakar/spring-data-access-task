@@ -1,4 +1,4 @@
-package com.rntgroup.service.implementation;
+package com.rntgroup.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.rntgroup.exception.NotFoundException;
 import com.rntgroup.model.User;
 import com.rntgroup.repository.UserRepository;
 
@@ -56,11 +57,11 @@ class UserServiceTest {
     @Test
     @DisplayName("Должен выбросить исключение, т.к. User с заданным id не найден")
     void shouldThrowExceptionBecauseUserByIdNotFound() {
-        RuntimeException expectedException = new RuntimeException("User with id = 0 not found");
+        NotFoundException expectedException = new NotFoundException("User with id = 0 not found");
 
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> userService.findById(0L));
+        NotFoundException thrown = assertThrows(NotFoundException.class, () -> userService.findById(0L));
         verify(userRepository).findById(0L);
         assertEquals(expectedException.getMessage(), thrown.getMessage());
     }
@@ -92,11 +93,11 @@ class UserServiceTest {
     @Test
     @DisplayName("Должен выбросить исключение, т.к. User с заданным email не найден")
     void shouldThrowExceptionBecauseUserByEmailNotFound() {
-        RuntimeException expectedException = new RuntimeException("User with email = incorrect.email@com not found");
+        NotFoundException expectedException = new NotFoundException("User with email = incorrect.email@com not found");
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
 
-        RuntimeException thrown = assertThrows(RuntimeException.class, () -> userService.findByEmail("incorrect.email@com"));
+        NotFoundException thrown = assertThrows(NotFoundException.class, () -> userService.findByEmail("incorrect.email@com"));
         verify(userRepository).findByEmail("incorrect.email@com");
         assertEquals(expectedException.getMessage(), thrown.getMessage());
     }

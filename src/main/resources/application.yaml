@@ -4,11 +4,3 @@ server:
 spring:
   application:
     name: spring-data-access-task
-
-data:
-  eventDatabase:
-    initDataFilePath: db\init-events-data.json
-  ticketDatabase:
-    initDataFilePath: db\init-tickets-data.json
-  userDatabase:
-    initDataFilePath: db\init-users-data.json

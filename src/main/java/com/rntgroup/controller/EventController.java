@@ -1,5 +1,7 @@
 package com.rntgroup.controller;
 
+import com.rntgroup.exception.BadRequestException;
+import com.rntgroup.exception.NotImplementedException;
 import com.rntgroup.facade.BookingFacade;
 import com.rntgroup.model.Event;
 import lombok.AccessLevel;
@@ -38,11 +40,11 @@ public class EventController {
                                  @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum) {
 
         if (Objects.nonNull(title) && Objects.nonNull(day)) {
-            throw new RuntimeException("Ошибка в запросе");
+            throw new BadRequestException("Ошибка в запросе: title и day не могут задаваться одновременно");
         }
 
         if (Objects.isNull(title) && Objects.isNull(day)) {
-            throw new RuntimeException("Метод не реализован");
+            throw new NotImplementedException("Метод получения всех мероприятий не реализован");
         }
 
         if (Objects.nonNull(title)) {

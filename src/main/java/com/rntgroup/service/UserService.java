@@ -1,5 +1,6 @@
 package com.rntgroup.service;
 
+import com.rntgroup.exception.NotFoundException;
 import com.rntgroup.model.User;
 import com.rntgroup.repository.UserRepository;
 import com.rntgroup.repository.util.Page;
@@ -33,7 +34,7 @@ public class UserService {
         log.debug("Method {}#findById was called with param: id = {}", this.getClass().getSimpleName(), id);
         return userRepository.findById(id)
                 .orElseThrow(() -> {
-                    var error = new RuntimeException(String.format("User with id = %d not found", id));
+                    var error = new NotFoundException(String.format("User with id = %d not found", id));
                     log.error("Method {}#findById returned error with message: {}", this.getClass().getSimpleName(), error.getMessage());
                     return error;
                 });
@@ -50,7 +51,7 @@ public class UserService {
         log.debug("Method {}#findByEmail was called with param: email = {}", this.getClass().getSimpleName(), email);
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> {
-                    var error = new RuntimeException(String.format("User with email = %s not found", email));
+                    var error = new NotFoundException(String.format("User with email = %s not found", email));
                     log.error("Method {}#findByEmail returned error with message: {}", this.getClass().getSimpleName(), error.getMessage());
                     return error;
                 });

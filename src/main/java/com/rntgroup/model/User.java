@@ -9,11 +9,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
-/**
- * TODO: User id should be unique <br>
- * TODO: User email should be unique
- */
-
 @Getter
 @Setter
 @EqualsAndHashCode

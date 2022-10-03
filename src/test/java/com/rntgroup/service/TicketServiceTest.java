@@ -1,4 +1,4 @@
-package com.rntgroup.service.implementation;
+package com.rntgroup.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.rntgroup.enumerate.Category;
+import com.rntgroup.exception.BadRequestException;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
@@ -51,13 +52,13 @@ class TicketServiceTest {
     @Test
     @DisplayName("Должен выбросить ошибку, т.к. на этот Event заданное место уже занято")
     void shouldThrowExceptionBecauseThisPlaceAlreadyExist() {
-        IllegalStateException expectedException = new IllegalStateException("Ticket with place = 0 already exist");
+        BadRequestException expectedException = new BadRequestException("Ticket with place = 0 already exist");
 
         Ticket testTicket = new Ticket(0L, 0L, 0L, Category.BAR, 0);
 
         when(ticketRepository.existByPlace(any(Ticket.class))).thenReturn(true);
 
-        RuntimeException thrown = assertThrows(IllegalStateException.class, () -> ticketService.create(testTicket));
+        BadRequestException thrown = assertThrows(BadRequestException.class, () -> ticketService.create(testTicket));
         assertEquals(expectedException.getMessage(), thrown.getMessage());
         verify(ticketRepository).existByPlace(testTicket);
         verify(ticketRepository, never()).save(testTicket);

@@ -1,5 +1,6 @@
 package com.rntgroup.service;
 
+import com.rntgroup.exception.NotFoundException;
 import com.rntgroup.model.Event;
 import com.rntgroup.repository.EventRepository;
 import com.rntgroup.repository.util.Page;
@@ -33,7 +34,7 @@ public class EventService {
     public Event findById(long id) {
         log.debug("Method {}#findById was called with param: id = {}", this.getClass().getSimpleName(), id);
         return eventRepository.findById(id).orElseThrow(() -> {
-                    var error = new RuntimeException(String.format("Event with id = %d not found", id));
+                    var error = new NotFoundException(String.format("Event with id = %d not found", id));
                     log.error("Method {}#findById returned error with message: {}", this.getClass().getSimpleName(), error.getMessage());
                     return error;
                 });

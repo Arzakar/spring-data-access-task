@@ -1,5 +1,7 @@
 package com.rntgroup.controller;
 
+import com.rntgroup.exception.BadRequestException;
+import com.rntgroup.exception.NotImplementedException;
 import com.rntgroup.facade.BookingFacade;
 import com.rntgroup.model.User;
 import lombok.AccessLevel;
@@ -37,11 +39,11 @@ public class UserController {
                                @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum) {
 
         if (Objects.nonNull(email) && Objects.nonNull(name)) {
-            throw new RuntimeException("Ошибка в запросе");
+            throw new BadRequestException("Ошибка в запросе: email и name не могут задаваться одновременно");
         }
 
         if (Objects.isNull(email) && Objects.isNull(name)) {
-            throw new RuntimeException("Метод не реализован");
+            throw new NotImplementedException("Метод получения всех пользователей не реализован");
         }
 
         if (Objects.nonNull(email)) {

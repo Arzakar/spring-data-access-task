@@ -28,6 +28,8 @@ import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -156,24 +158,30 @@ public class BookingFacadeImp implements BookingFacade {
 
     @PostConstruct
     public void preloadTickets() throws IOException {
-        InputStream usersInputStream = new ByteArrayInputStream(FileReader.readResourceAsString("init-data/users.xml").getBytes());
+        Charset utf8 = StandardCharsets.UTF_8;
+
+        InputStream usersInputStream = new ByteArrayInputStream(
+                FileReader.readResourceAsString("init-data/users.xml").getBytes(utf8)
+        );
         UserXmlDtoList users = marshallerWrapper.unmarshall(usersInputStream, UserXmlDtoList.class);
         users.getUsers().stream()
                 .map(userMapper::toModel)
                 .forEach(userService::create);
 
-        InputStream eventsInputStream = new ByteArrayInputStream(FileReader.readResourceAsString("init-data/events.xml").getBytes());
+        InputStream eventsInputStream = new ByteArrayInputStream(
+                FileReader.readResourceAsString("init-data/events.xml").getBytes(utf8)
+        );
         EventXmlDtoList events = marshallerWrapper.unmarshall(eventsInputStream, EventXmlDtoList.class);
         events.getEvents().stream()
                 .map(eventMapper::toModel)
                 .forEach(eventService::create);
 
-        InputStream ticketsInputStream = new ByteArrayInputStream(FileReader.readResourceAsString("init-data/tickets.xml").getBytes());
+        InputStream ticketsInputStream = new ByteArrayInputStream(
+                FileReader.readResourceAsString("init-data/tickets.xml").getBytes(utf8)
+        );
         TicketXmlDtoList tickets = marshallerWrapper.unmarshall(ticketsInputStream, TicketXmlDtoList.class);
         tickets.getTickets().stream()
                 .map(ticketMapper::toModel)
                 .forEach(ticketService::create);
-
-        System.out.println(tickets);
     }
 }

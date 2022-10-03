@@ -1,6 +1,8 @@
 package com.rntgroup.controller;
 
 import com.rntgroup.dto.BookTicketRequestDto;
+import com.rntgroup.exception.BadRequestException;
+import com.rntgroup.exception.NotImplementedException;
 import com.rntgroup.facade.BookingFacade;
 import com.rntgroup.model.Ticket;
 
@@ -40,11 +42,11 @@ public class TicketController {
                                          @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum) {
 
         if (Objects.nonNull(userId) && Objects.nonNull(eventId)) {
-            throw new RuntimeException("Ошибка в запросе");
+            throw new BadRequestException("Ошибка в запросе: userId и eventId не могут задаваться одновременно");
         }
 
         if (Objects.isNull(userId) && Objects.isNull(eventId)) {
-            throw new RuntimeException("Метод не реализован");
+            throw new NotImplementedException("Метод получения всех билетов не реализован");
         }
 
         if (Objects.nonNull(userId)) {
