@@ -1,6 +1,7 @@
 package com.rntgroup;
 
 import com.rntgroup.model.Event;
+import com.rntgroup.model.User;
 import lombok.experimental.UtilityClass;
 import org.jeasy.random.EasyRandom;
 import org.jeasy.random.EasyRandomParameters;
@@ -14,6 +15,13 @@ public class TestDataUtil {
         parameters.excludeField(FieldPredicates.named("id").and(FieldPredicates.inClass(Event.class)));
 
         return new EasyRandom(parameters).nextObject(Event.class);
+    }
+
+    public User getRandomUser() {
+        var parameters = new EasyRandomParameters();
+        parameters.excludeField(FieldPredicates.named("id").and(FieldPredicates.inClass(Event.class)));
+
+        return new EasyRandom(parameters).nextObject(User.class);
     }
 
 }

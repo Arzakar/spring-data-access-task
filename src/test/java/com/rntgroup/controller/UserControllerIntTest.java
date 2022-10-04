@@ -8,8 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rntgroup.TestDataUtil;
 import com.rntgroup.TestUtil;
-import com.rntgroup.db.EventDatabase;
-import com.rntgroup.model.Event;
+import com.rntgroup.db.UserDatabase;
+import com.rntgroup.model.User;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,122 +21,120 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-class EventControllerIntTest {
+class UserControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private EventDatabase eventDatabase;
+    private UserDatabase userDatabase;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        eventDatabase.getData().clear();
+        userDatabase.getData().clear();
     }
 
     @Test
     @SneakyThrows
-    void shouldReturnEventById() {
-        Event event = eventDatabase.insert(TestDataUtil.getRandomEvent());
+    void shouldReturnUserById() {
+        User user = userDatabase.insert(TestDataUtil.getRandomUser());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/events/" + event.getId())
+                        .get("/users/" + user.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(event)));
+                .andExpect(content().json(objectMapper.writeValueAsString(user)));
     }
 
     @Test
     @SneakyThrows
-    void shouldReturnEventByTitle() {
-        Event event = eventDatabase.insert(TestDataUtil.getRandomEvent());
+    void shouldReturnUserByName() {
+        User user = userDatabase.insert(TestDataUtil.getRandomUser());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/events?title=" + event.getTitle())
+                        .get("/users?name=" + user.getName())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(List.of(event))));
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(user))));
     }
 
     @Test
     @SneakyThrows
-    void shouldReturnEventByDate() {
-        Event event = eventDatabase.insert(TestDataUtil.getRandomEvent());
-        event.setDate(new SimpleDateFormat("yyyy-MM-dd").parse("2022-10-10"));
+    void shouldReturnUserByEmail() {
+        User user = userDatabase.insert(TestDataUtil.getRandomUser());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/events?day=2022-10-10")
+                        .get("/users?email=" + user.getEmail())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(List.of(event))));
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(user))));
     }
 
     @Test
     @SneakyThrows
-    void shouldCreateEvent() {
-        Event eventForSave = TestDataUtil.getRandomEvent();
-        String eventForSaveAsString = objectMapper.writeValueAsString(eventForSave);
+    void shouldCreateUser() {
+        User userForSave = TestDataUtil.getRandomUser();
+        String userForSaveAsString = objectMapper.writeValueAsString(userForSave);
 
         var result = mockMvc.perform(MockMvcRequestBuilders
-                        .post("/events")
-                        .content(eventForSaveAsString)
+                        .post("/users")
+                        .content(userForSaveAsString)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals(1, eventDatabase.getData().size());
+        assertEquals(1, userDatabase.getData().size());
 
-        Event savedEvent = eventDatabase.getData().values().stream().findFirst().orElseThrow();
-        result.andExpect(content().json(objectMapper.writeValueAsString(savedEvent)));
+        User savedUser = userDatabase.getData().values().stream().findFirst().orElseThrow();
+        result.andExpect(content().json(objectMapper.writeValueAsString(savedUser)));
     }
 
     @Test
     @SneakyThrows
-    void shouldUpdateEvent() {
-        Event savedEvent = eventDatabase.insert(TestDataUtil.getRandomEvent());
-        Event eventForUpdate = TestUtil.deepCopy(savedEvent);
-        eventForUpdate.setTitle("TestName");
+    void shouldUpdateUser() {
+        User savedUser = userDatabase.insert(TestDataUtil.getRandomUser());
+        User userForUpdate = TestUtil.deepCopy(savedUser);
+        userForUpdate.setName("TestName");
 
-        String eventForUpdateAsString = objectMapper.writeValueAsString(eventForUpdate);
+        String userForUpdateAsString = objectMapper.writeValueAsString(userForUpdate);
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .patch("/events")
-                        .content(eventForUpdateAsString)
+                        .patch("/users")
+                        .content(userForUpdateAsString)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(eventForUpdateAsString));
+                .andExpect(content().json(userForUpdateAsString));
 
-        assertEquals(1, eventDatabase.getData().size());
-        assertEquals(eventForUpdate, eventDatabase.getData().values().stream().findFirst().orElseThrow());
+        assertEquals(1, userDatabase.getData().size());
+        assertEquals(userForUpdate, userDatabase.getData().values().stream().findFirst().orElseThrow());
     }
 
     @Test
     @SneakyThrows
-    void shouldDeleteEvent() {
-        Event event = eventDatabase.insert(TestDataUtil.getRandomEvent());
+    void shouldDeleteUser() {
+        User user = userDatabase.insert(TestDataUtil.getRandomUser());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .delete("/events/" + event.getId())
+                        .delete("/users/" + user.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
 
-        assertTrue(eventDatabase.getData().isEmpty());
+        assertTrue(userDatabase.getData().isEmpty());
     }
 
     @Test
     @SneakyThrows
     void shouldReturnNotFoundException() {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/events/10")
+                        .get("/users/10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -145,12 +143,7 @@ class EventControllerIntTest {
     @SneakyThrows
     void shouldReturnBadRequest() {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/events?title=Test&day=2022-10-10")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-
-        mockMvc.perform(MockMvcRequestBuilders
-                        .get("/events?day=2022/10/10")
+                        .get("/users?name=TestName&email=TestEmail")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -159,7 +152,7 @@ class EventControllerIntTest {
     @SneakyThrows
     void shouldReturnNotImplement() {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/events")
+                        .get("/users")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotImplemented());
     }
@@ -168,7 +161,7 @@ class EventControllerIntTest {
     @SneakyThrows
     void shouldReturnInternalServerError() {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/events/random")
+                        .get("/users/random")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isInternalServerError());
     }
