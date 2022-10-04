@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
 
@@ -35,7 +37,7 @@ public class EventController {
 
     @GetMapping
     public List<Event> getEvents(@RequestParam(name = "title", required = false) String title,
-                                 @RequestParam(name = "day", required = false) Date day,
+                                 @RequestParam(name = "day", required = false) String day,
                                  @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
                                  @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum) {
 
@@ -51,16 +53,20 @@ public class EventController {
             return bookingFacade.getEventsByTitle(title, pageSize, pageNum);
         }
 
-        return bookingFacade.getEventsForDay(day, pageSize, pageNum);
+        try {
+            return bookingFacade.getEventsForDay(new SimpleDateFormat("yyyy-MM-dd").parse(day), pageSize, pageNum);
+        } catch (ParseException e) {
+            throw new BadRequestException("Неверный формат даты, используйте шаблон YYYY-MM-DD");
+        }
     }
 
     @PostMapping
-    public Event createEvent(Event event) {
+    public Event createEvent(@RequestBody Event event) {
         return bookingFacade.createEvent(event);
     }
 
     @PatchMapping
-    public Event updateEvent(Event event) {
+    public Event updateEvent(@RequestBody Event event) {
         return bookingFacade.updateEvent(event);
     }
 
