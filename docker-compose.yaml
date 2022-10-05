@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  book-ticket-service:
+    image: postgres:12-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: BOOK_TICKET_SERVICE
+      PGDATA: "/var/lib/postgresql/data/docker-data/spring-data-access"
+    ports:
+      - "5432:5432"
+    volumes:
+      - .:/var/lib/postgresql/data
