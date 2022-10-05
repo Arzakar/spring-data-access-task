@@ -2,26 +2,30 @@ package com.rntgroup.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.rntgroup.TestDataUtil;
 import com.rntgroup.exception.NotFoundException;
 import com.rntgroup.model.User;
 import com.rntgroup.repository.UserRepository;
 
-import com.rntgroup.repository.util.Page;
-import com.rntgroup.repository.util.SearchResult;
-import com.rntgroup.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -35,92 +39,100 @@ class UserServiceTest {
     @Test
     @DisplayName("Должен сохранить User в БД и вернуть сохранённый объект")
     void shouldCreateEvent() {
-        User testUser = new User(0L, "TestUser", "test.email@test.com");
+        User user = TestDataUtil.getRandomUser();
 
-        when(userRepository.save(any(User.class))).thenReturn(testUser);
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
-        assertEquals(testUser, userService.create(testUser));
-        verify(userRepository).save(testUser);
+        assertEquals(user, userService.create(user));
+        verify(userRepository).save(user);
     }
 
     @Test
     @DisplayName("Должен вернуть User из БД, найденного по id")
     void shouldReturnUserById() {
-        User testUser = new User(0L, "TestUser", "test.email@test.com");
+        UUID id = UUID.randomUUID();
+        User user = TestDataUtil.getRandomUser().setId(id);
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(testUser));
+        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.of(user));
 
-        assertEquals(testUser, userService.findById(0L));
-        verify(userRepository).findById(0L);
+        assertEquals(user, userService.findById(id));
+        verify(userRepository).findById(id);
     }
 
     @Test
     @DisplayName("Должен выбросить исключение, т.к. User с заданным id не найден")
     void shouldThrowExceptionBecauseUserByIdNotFound() {
-        NotFoundException expectedException = new NotFoundException("User with id = 0 not found");
+        UUID id = UUID.randomUUID();
+        NotFoundException expectedException = new NotFoundException(String.format("User with id = %s not found", id));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+        when(userRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
-        NotFoundException thrown = assertThrows(NotFoundException.class, () -> userService.findById(0L));
-        verify(userRepository).findById(0L);
+        NotFoundException thrown = assertThrows(NotFoundException.class, () -> userService.findById(id));
+        verify(userRepository).findById(id);
         assertEquals(expectedException.getMessage(), thrown.getMessage());
     }
 
     @Test
     @DisplayName("Должен вернуть список, содержащий Users с одинаковыми именами с определённой страницы")
     void shouldReturnUsersByName() {
-        List<User> testUsers = List.of(new User(0L, "TestUser", "test_01.email@test.com"),
-                new User(1L, "TestUser", "test_02.email@test.com"));
+        String name = "UserName";
+        List<User> users = List.of(
+                new User().setName(name),
+                new User().setName(name)
+        );
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "name");
 
-        when(userRepository.findByName(any(String.class), any(Page.class)))
-                .thenReturn(new SearchResult<User>().setContent(testUsers).setPage(Page.of(2, 1)));
+        when(userRepository.findByName(any(String.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(users, pageRequest, users.size()));
 
-        assertEquals(testUsers, userService.findByName("TestUser", 2, 1));
-        verify(userRepository).findByName("TestUser", Page.of(2, 1));
+        assertEquals(users, userService.findByName(name, pageRequest.getPageSize(), pageRequest.getPageNumber()));
+        verify(userRepository).findByName(name, pageRequest);
     }
 
     @Test
     @DisplayName("Должен вернуть User из БД, найденного по email")
     void shouldReturnUserByEmail() {
-        User testUser = new User(0L, "TestUser", "test.email@test.com");
+        String email = "mail@mail.com";
+        User user = new User().setEmail(email);
 
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(testUser));
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
 
-        assertEquals(testUser, userService.findByEmail("test.email@test.com"));
-        verify(userRepository).findByEmail("test.email@test.com");
+        assertEquals(user, userService.findByEmail(email));
+        verify(userRepository).findByEmail(email);
     }
 
     @Test
     @DisplayName("Должен выбросить исключение, т.к. User с заданным email не найден")
     void shouldThrowExceptionBecauseUserByEmailNotFound() {
-        NotFoundException expectedException = new NotFoundException("User with email = incorrect.email@com not found");
+        String email = "mail@mail.com";
+        NotFoundException expectedException = new NotFoundException(String.format("User with email = %s not found", email));
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.empty());
 
-        NotFoundException thrown = assertThrows(NotFoundException.class, () -> userService.findByEmail("incorrect.email@com"));
-        verify(userRepository).findByEmail("incorrect.email@com");
+        NotFoundException thrown = assertThrows(NotFoundException.class, () -> userService.findByEmail(email));
+        verify(userRepository).findByEmail(email);
         assertEquals(expectedException.getMessage(), thrown.getMessage());
     }
 
     @Test
     @DisplayName("Должен обновить User в БД и вернуть обновлённый объект")
     void shouldUpdateEvent() {
-        User testUser = new User(2L, "UpdatedTestUser", "test.email@test.com");
+        User user = TestDataUtil.getRandomUser();
 
-        when(userRepository.update(any(User.class))).thenReturn(testUser);
+        when(userRepository.save(any(User.class))).thenReturn(user);
 
-        assertEquals(testUser, userService.update(testUser));
-        verify(userRepository).update(testUser);
+        assertEquals(user, userService.update(user));
+        verify(userRepository).save(user);
     }
 
     @Test
     @DisplayName("Должен удалить User из БД и вернуть удалённый объект")
     void shouldDeleteEventById() {
-        User testUser = new User(0L, "DeletedTestUser", "test.email@test.com");
+        UUID id = UUID.randomUUID();
 
-        when(userRepository.deleteById(any(Long.class))).thenReturn(testUser);
+        when(userRepository.existsById(any(UUID.class))).thenReturn(false);
 
-        assertEquals(testUser, userService.deleteById(0L));
-        verify(userRepository).deleteById(0L);
+        assertTrue(userService.deleteById(id));
+        verify(userRepository).deleteById(id);
     }
 }

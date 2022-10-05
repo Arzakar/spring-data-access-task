@@ -8,8 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rntgroup.TestDataUtil;
 import com.rntgroup.TestUtil;
-import com.rntgroup.db.UserDatabase;
 import com.rntgroup.model.User;
+import com.rntgroup.repository.UserRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,35 +17,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
-@ActiveProfiles("test")
 @AutoConfigureMockMvc
+@Transactional
 class UserControllerIntTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    private UserDatabase userDatabase;
+    private UserRepository userRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        userDatabase.getData().clear();
+        userRepository.deleteAll();
     }
 
     @Test
     @SneakyThrows
     void shouldReturnUserById() {
-        User user = userDatabase.insert(TestDataUtil.getRandomUser());
+        User user = userRepository.save(TestDataUtil.getRandomUser());
 
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/users/" + user.getId())
@@ -57,10 +58,10 @@ class UserControllerIntTest {
     @Test
     @SneakyThrows
     void shouldReturnUserByName() {
-        User user = userDatabase.insert(TestDataUtil.getRandomUser());
+        User user = userRepository.save(TestDataUtil.getRandomUser());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/users?name=" + user.getName())
+                        .get("/users/search?name=" + user.getName())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(user))));
@@ -69,10 +70,10 @@ class UserControllerIntTest {
     @Test
     @SneakyThrows
     void shouldReturnUserByEmail() {
-        User user = userDatabase.insert(TestDataUtil.getRandomUser());
+        User user = userRepository.save(TestDataUtil.getRandomUser());
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/users?email=" + user.getEmail())
+                        .get("/users/search?email=" + user.getEmail())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(user))));
@@ -90,16 +91,16 @@ class UserControllerIntTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals(1, userDatabase.getData().size());
+        assertEquals(1, userRepository.findAll().size());
 
-        User savedUser = userDatabase.getData().values().stream().findFirst().orElseThrow();
+        User savedUser = userRepository.findAll().stream().findFirst().orElseThrow();
         result.andExpect(content().json(objectMapper.writeValueAsString(savedUser)));
     }
 
     @Test
     @SneakyThrows
     void shouldUpdateUser() {
-        User savedUser = userDatabase.insert(TestDataUtil.getRandomUser());
+        User savedUser = userRepository.save(TestDataUtil.getRandomUser());
         User userForUpdate = TestUtil.deepCopy(savedUser);
         userForUpdate.setName("TestName");
 
@@ -112,14 +113,14 @@ class UserControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(userForUpdateAsString));
 
-        assertEquals(1, userDatabase.getData().size());
-        assertEquals(userForUpdate, userDatabase.getData().values().stream().findFirst().orElseThrow());
+        assertEquals(1, userRepository.findAll().size());
+        assertEquals(userForUpdate, userRepository.findAll().stream().findFirst().orElseThrow());
     }
 
     @Test
     @SneakyThrows
     void shouldDeleteUser() {
-        User user = userDatabase.insert(TestDataUtil.getRandomUser());
+        User user = userRepository.save(TestDataUtil.getRandomUser());
 
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/users/" + user.getId())
@@ -127,14 +128,14 @@ class UserControllerIntTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
 
-        assertTrue(userDatabase.getData().isEmpty());
+        assertTrue(userRepository.findAll().isEmpty());
     }
 
     @Test
     @SneakyThrows
     void shouldReturnNotFoundException() {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/users/10")
+                        .get("/users/" + UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -143,7 +144,7 @@ class UserControllerIntTest {
     @SneakyThrows
     void shouldReturnBadRequest() {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/users?name=TestName&email=TestEmail")
+                        .get("/users/search?name=TestName&email=TestEmail")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -152,7 +153,7 @@ class UserControllerIntTest {
     @SneakyThrows
     void shouldReturnNotImplement() {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/users")
+                        .get("/users/search")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotImplemented());
     }

@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/tickets")
@@ -29,16 +31,18 @@ public class TicketController {
     BookingFacade bookingFacade;
 
     @PostMapping
-    public Ticket bookTicket(BookTicketRequestDto bookTicketRequest) {
-        return bookingFacade.bookTicket(bookTicketRequest.getUserId(),
+    public Ticket bookTicket(@RequestBody BookTicketRequestDto bookTicketRequest) {
+        return bookingFacade.bookTicket(
+                bookTicketRequest.getUserId(),
                 bookTicketRequest.getEventId(),
                 bookTicketRequest.getPlace(),
-                bookTicketRequest.getCategory());
+                bookTicketRequest.getCategory()
+        );
     }
 
-    @GetMapping
-    public List<Ticket> getBookedTickets(@RequestParam(name = "userId", required = false) Long userId,
-                                         @RequestParam(name = "eventId", required = false) Long eventId,
+    @GetMapping("/search")
+    public List<Ticket> getBookedTickets(@RequestParam(name = "userId", required = false) UUID userId,
+                                         @RequestParam(name = "eventId", required = false) UUID eventId,
                                          @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
                                          @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum) {
 
@@ -58,7 +62,7 @@ public class TicketController {
     }
 
     @DeleteMapping("/{id}")
-    public boolean cancelTicket(@PathVariable("id") long ticketId) {
+    public boolean cancelTicket(@PathVariable("id") UUID ticketId) {
         return bookingFacade.cancelTicket(ticketId);
     }
 

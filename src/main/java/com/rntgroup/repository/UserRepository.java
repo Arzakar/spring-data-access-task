@@ -1,38 +1,20 @@
 package com.rntgroup.repository;
 
-import com.rntgroup.db.UserDatabase;
 import com.rntgroup.model.User;
 
-import com.rntgroup.repository.util.Page;
-import com.rntgroup.repository.util.SearchResult;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
-@Slf4j
-@Component
-@Getter
-@Setter
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UserRepository extends AbstractRepository<User, Long> {
+@Repository
+public interface UserRepository extends JpaRepository<User, UUID> {
 
-    UserDatabase database;
+    Page<User> findByName(String name, Pageable pageable);
 
-    public SearchResult<User> findByName(String name, Page page) {
-        log.debug("Method {}#findByName was called with params: name = {}, page = {}", this.getClass().getSimpleName(), name, page);
-        return SearchResult.pack(getDatabase().selectByName(name), page);
-    }
-
-    public Optional<User> findByEmail(String email) {
-        log.debug("Method {}#findByEmail was called with param: email = {}", this.getClass().getSimpleName(), email);
-        return Optional.ofNullable(getDatabase().selectByEmail(email));
-    }
+    Optional<User> findByEmail(String email);
 
 }

@@ -1,42 +1,22 @@
 package com.rntgroup.repository;
 
-import com.rntgroup.db.TicketDatabase;
 import com.rntgroup.model.Ticket;
-import com.rntgroup.repository.util.Page;
-import com.rntgroup.repository.util.SearchResult;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
-@Slf4j
-@Component
-@Getter
-@Setter
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class TicketRepository extends AbstractRepository<Ticket, Long> {
+@Repository
+public interface TicketRepository extends JpaRepository<Ticket, UUID> {
 
-    TicketDatabase database;
+    Page<Ticket> findByUserId(UUID userId, Pageable pageable);
 
-    public SearchResult<Ticket> findByUserId(long userId, Page page) {
-        log.debug("Method {}#findByUserId was called with params: userId = {}, page = {}", this.getClass().getSimpleName(), userId, page);
-        return SearchResult.pack(getDatabase().selectByUserId(userId), page);
-    }
+    Page<Ticket> findByEventId(UUID eventId, Pageable pageable);
 
-    public SearchResult<Ticket> findByEventId(long eventId, Page page) {
-        log.debug("Method {}#findByEventId was called with params: eventId = {}, page = {}", this.getClass().getSimpleName(), eventId, page);
-        return SearchResult.pack(getDatabase().selectByEventId(eventId), page);
-    }
+    Optional<Ticket> findByEventIdAndPlace(UUID eventId, int place);
 
-    public boolean existByPlace(Ticket ticket) {
-        log.debug("Method {}#existByPlace was called with param: ticket = {}", this.getClass().getSimpleName(), ticket);
-        return Objects.nonNull(getDatabase().selectByEventIdAndPlace(ticket.getEventId(), ticket.getPlace()));
-    }
 }
