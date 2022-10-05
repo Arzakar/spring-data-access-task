@@ -1,5 +1,6 @@
 package com.rntgroup;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
@@ -19,6 +20,12 @@ public class TestUtil {
 
     public Date createDate(int year, int month, int day) {
         return new Calendar.Builder().setDate(year, month, day).build().getTime();
+    }
+
+    @SneakyThrows
+    public <T> T deepCopy(T object) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return (T) objectMapper.readValue(objectMapper.writeValueAsString(object), object.getClass());
     }
 
 }

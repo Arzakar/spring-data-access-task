@@ -36,13 +36,13 @@
           p:database-ref="userDatabase"/>
 
     <bean id="eventService"
-          class="com.rntgroup.service.implementation.EventServiceImpl"
+          class="com.rntgroup.service.EventService"
           autowire="byType"/>
     <bean id="ticketService"
-          class="com.rntgroup.service.implementation.TicketServiceImpl"
+          class="com.rntgroup.service.TicketService"
           autowire="byType"/>
     <bean id="userService"
-          class="com.rntgroup.service.implementation.UserServiceImpl"
+          class="com.rntgroup.service.UserService"
           autowire="byType"/>
 
     <bean id="bookingFacade"

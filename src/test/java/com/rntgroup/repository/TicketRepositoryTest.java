@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rntgroup.TestUtil;
 import com.rntgroup.db.TicketDatabase;
+import com.rntgroup.enumerate.Category;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.repository.util.Page;
 import com.rntgroup.repository.util.SearchResult;
@@ -94,16 +95,16 @@ class TicketRepositoryTest {
     @Test
     @DisplayName("Должен проверить занято ли конкретное место на конкретное мероприятие")
     void shouldCheckPlaceOnEvent() {
-        Ticket ticketWithExistedPlace = new Ticket(0L, 0L, 0L, Ticket.Category.BAR, 10);
+        Ticket ticketWithExistedPlace = new Ticket(0L, 0L, 0L, Category.BAR, 10);
 
         when(ticketDatabase.selectByEventIdAndPlace(ticketWithExistedPlace.getEventId(), ticketWithExistedPlace.getPlace()))
                 .thenReturn(ticketWithExistedPlace);
 
-        assertTrue(ticketRepository.existByPlace(new Ticket(1L, 0L, 1L, Ticket.Category.BAR, 10)));
+        assertTrue(ticketRepository.existByPlace(new Ticket(1L, 0L, 1L, Category.BAR, 10)));
 
         when(ticketDatabase.selectByEventIdAndPlace(any(Long.class), any(Integer.class)))
                 .thenReturn(null);
 
-        assertFalse(ticketRepository.existByPlace(new Ticket(2L, 0L, 2L, Ticket.Category.BAR, 8)));
+        assertFalse(ticketRepository.existByPlace(new Ticket(2L, 0L, 2L, Category.BAR, 8)));
     }
 }

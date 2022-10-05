@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rntgroup.TestUtil;
+import com.rntgroup.enumerate.Category;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 
@@ -103,7 +103,7 @@ class TicketDatabaseTest {
 
     private static Stream<Arguments> getEventIdsAndPlaces() {
         return Stream.of(
-                Arguments.of(2, 1, new Ticket(0L, 2L, 1L, Ticket.Category.BAR, 1)),
+                Arguments.of(2, 1, new Ticket(0L, 2L, 1L, Category.BAR, 1)),
                 Arguments.of(2, 5, null)
         );
     }
