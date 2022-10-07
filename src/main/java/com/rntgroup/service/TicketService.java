@@ -19,8 +19,6 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@Getter
-@Setter
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TicketService {

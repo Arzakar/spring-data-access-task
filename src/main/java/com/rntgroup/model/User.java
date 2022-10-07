@@ -17,6 +17,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.util.Objects;
 import java.util.Set;
@@ -48,6 +49,11 @@ public class User {
     @ToString.Exclude
     @JsonManagedReference(value = "user")
     Set<Ticket> tickets;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    @ToString.Exclude
+    @JsonManagedReference(value = "user_account")
+    UserAccount account;
 
     @Override
     public boolean equals(Object o) {

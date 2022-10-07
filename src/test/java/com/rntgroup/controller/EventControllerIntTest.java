@@ -12,7 +12,6 @@ import com.rntgroup.model.Event;
 import com.rntgroup.repository.EventRepository;
 
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

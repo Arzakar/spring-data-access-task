@@ -10,8 +10,10 @@ import com.rntgroup.mapper.UserMapper;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
+import com.rntgroup.model.UserAccount;
 import com.rntgroup.service.EventService;
 import com.rntgroup.service.TicketService;
+import com.rntgroup.service.UserAccountService;
 import com.rntgroup.service.UserService;
 
 import com.rntgroup.util.FileReader;
@@ -25,12 +27,12 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -42,6 +44,7 @@ public class BookingFacadeImp implements BookingFacade {
     EventService eventService;
     UserService userService;
     TicketService ticketService;
+    UserAccountService userAccountService;
 
     EventMapper eventMapper;
     UserMapper userMapper;
@@ -155,6 +158,11 @@ public class BookingFacadeImp implements BookingFacade {
     public boolean cancelTicket(UUID ticketId) {
         log.info("Method {}#cancelTicket was called with param: ticketId = {}", this.getClass().getSimpleName(), ticketId);
         return ticketService.deleteById(ticketId);
+    }
+
+    @Override
+    public UserAccount replenishAccount(UUID userId, BigDecimal amount) {
+        return userAccountService.replenish(userId, amount);
     }
 
     public void preloadTickets() throws IOException {
