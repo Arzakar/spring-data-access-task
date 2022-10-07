@@ -4,7 +4,9 @@ import com.rntgroup.enumerate.Category;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
+import com.rntgroup.model.UserAccount;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -141,4 +143,5 @@ public interface BookingFacade {
      */
     boolean cancelTicket(UUID ticketId);
 
+    UserAccount replenishAccount(UUID userId, BigDecimal amount);
 }

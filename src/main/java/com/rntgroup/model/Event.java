@@ -18,6 +18,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
@@ -43,6 +44,9 @@ public class Event {
 
     @Column(name = "date", nullable = false)
     Date date;
+
+    @Column(name = "price", nullable = false)
+    BigDecimal price;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "event")
     @BatchSize(size = 20)
