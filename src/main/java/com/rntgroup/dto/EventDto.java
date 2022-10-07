@@ -1,26 +1,26 @@
-package com.rntgroup.dto.xml;
+package com.rntgroup.dto;
 
-import com.rntgroup.enumerate.Category;
-import com.rntgroup.model.Event;
-import com.rntgroup.model.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 @XmlRootElement
 @Data
 @Accessors(chain = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketXmlDto {
+public class EventDto {
 
     UUID id;
-    Event event;
-    User user;
-    Category category;
-    int place;
+    String title;
+    LocalDate date;
+    BigDecimal price;
+    Set<UUID> ticketIds;
 
 }

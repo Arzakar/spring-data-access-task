@@ -29,6 +29,16 @@ public class ControllerExceptionHandler {
         return new ResponseEntity<>(error, error.getStatus());
     }
 
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorDto> handle(ValidationException exception) {
+        ErrorDto error = new ErrorDto()
+                .setStatus(HttpStatus.BAD_REQUEST)
+                .setMessage(exception.getMessage())
+                .setDetails(exception.getCause());
+
+        return new ResponseEntity<>(error, error.getStatus());
+    }
+
     @ExceptionHandler(NotImplementedException.class)
     public ResponseEntity<ErrorDto> handle(NotImplementedException exception) {
         ErrorDto error = new ErrorDto()

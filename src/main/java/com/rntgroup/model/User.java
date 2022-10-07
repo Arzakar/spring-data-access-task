@@ -44,16 +44,16 @@ public class User {
     @Column(name = "email", nullable = false)
     String email;
 
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
+    @ToString.Exclude
+    @JsonManagedReference(value = "user_account")
+    UserAccount account;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @BatchSize(size = 5)
     @ToString.Exclude
     @JsonManagedReference(value = "user")
     Set<Ticket> tickets;
-
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "user")
-    @ToString.Exclude
-    @JsonManagedReference(value = "user_account")
-    UserAccount account;
 
     @Override
     public boolean equals(Object o) {

@@ -1,14 +1,14 @@
 package com.rntgroup.controller;
 
-import com.rntgroup.dto.BookTicketRequestDto;
+import com.rntgroup.dto.TicketDto;
 import com.rntgroup.exception.BadRequestException;
 import com.rntgroup.exception.NotImplementedException;
 import com.rntgroup.facade.BookingFacade;
-import com.rntgroup.model.Ticket;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,20 +31,27 @@ public class TicketController {
     BookingFacade bookingFacade;
 
     @PostMapping
-    public Ticket bookTicket(@RequestBody BookTicketRequestDto bookTicketRequest) {
+    public TicketDto bookTicket(@RequestBody TicketDto ticketDto) {
         return bookingFacade.bookTicket(
-                bookTicketRequest.getUserId(),
-                bookTicketRequest.getEventId(),
-                bookTicketRequest.getPlace(),
-                bookTicketRequest.getCategory()
+                ticketDto.getUserId(),
+                ticketDto.getEventId(),
+                ticketDto.getPlace(),
+                ticketDto.getCategory()
         );
     }
 
+    @DeleteMapping("/{id}")
+    public boolean cancelTicket(@PathVariable("id") UUID ticketId) {
+        return bookingFacade.cancelTicket(ticketId);
+    }
+
     @GetMapping("/search")
-    public List<Ticket> getBookedTickets(@RequestParam(name = "userId", required = false) UUID userId,
+    public List<TicketDto> getBookedTickets(@RequestParam(name = "userId", required = false) UUID userId,
                                          @RequestParam(name = "eventId", required = false) UUID eventId,
+                                         @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum,
                                          @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
-                                         @RequestParam(name = "pageNum", required = false, defaultValue = "1") int pageNum) {
+                                         @RequestParam(name = "direction", required = false, defaultValue = "ASC") Sort.Direction direction,
+                                         @RequestParam(name = "sortParam", required = false, defaultValue = "id") String sortParam) {
 
         if (Objects.nonNull(userId) && Objects.nonNull(eventId)) {
             throw new BadRequestException("Ошибка в запросе: userId и eventId не могут задаваться одновременно");
@@ -55,15 +62,10 @@ public class TicketController {
         }
 
         if (Objects.nonNull(userId)) {
-            return bookingFacade.getBookedTickets(bookingFacade.getUserById(userId), pageSize, pageNum);
+            return bookingFacade.getBookedTickets(bookingFacade.getUserById(userId), pageNum, pageSize, direction, sortParam);
         }
 
-        return bookingFacade.getBookedTickets(bookingFacade.getEventById(eventId), pageSize, pageNum);
-    }
-
-    @DeleteMapping("/{id}")
-    public boolean cancelTicket(@PathVariable("id") UUID ticketId) {
-        return bookingFacade.cancelTicket(ticketId);
+        return bookingFacade.getBookedTickets(bookingFacade.getEventById(eventId), pageNum, pageSize, direction, sortParam);
     }
 
 }

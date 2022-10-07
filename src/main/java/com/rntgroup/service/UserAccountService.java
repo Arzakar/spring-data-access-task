@@ -1,6 +1,6 @@
 package com.rntgroup.service;
 
-import com.rntgroup.exception.BadRequestException;
+import com.rntgroup.exception.ValidationException;
 import com.rntgroup.model.UserAccount;
 import com.rntgroup.repository.UserAccountRepository;
 import lombok.AccessLevel;
@@ -23,7 +23,7 @@ public class UserAccountService {
 
     public UserAccount create(UUID userId) {
         if (userAccountRepository.findByUserId(userId).isEmpty()) {
-            throw new BadRequestException(String.format("У клиента с id = %s уже есть счёт", userId));
+            throw new ValidationException(String.format("У клиента с id = %s уже есть счёт", userId));
         }
 
         UserAccount userAccount = new UserAccount()
