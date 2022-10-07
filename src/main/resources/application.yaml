@@ -4,3 +4,13 @@ server:
 spring:
   application:
     name: spring-data-access-task
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/BOOK_TICKET_SERVICE
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create

@@ -6,14 +6,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rntgroup.TestDataUtil;
-import com.rntgroup.db.EventDatabase;
-import com.rntgroup.db.TicketDatabase;
-import com.rntgroup.db.UserDatabase;
 import com.rntgroup.dto.BookTicketRequestDto;
 import com.rntgroup.enumerate.Category;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
+import com.rntgroup.repository.EventRepository;
+import com.rntgroup.repository.TicketRepository;
+import com.rntgroup.repository.UserRepository;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,14 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
-@ActiveProfiles("test")
 @AutoConfigureMockMvc
 class TicketControllerIntTest {
 
@@ -36,29 +35,29 @@ class TicketControllerIntTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private EventDatabase eventDatabase;
+    private EventRepository eventRepository;
 
     @Autowired
-    private TicketDatabase ticketDatabase;
+    private TicketRepository ticketRepository;
 
     @Autowired
-    private UserDatabase userDatabase;
+    private UserRepository userRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
-        eventDatabase.getData().clear();
-        ticketDatabase.getData().clear();
-        userDatabase.getData().clear();
+        ticketRepository.deleteAll();
+        eventRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
     @SneakyThrows
     void shouldBookTicket() {
-        Event event = eventDatabase.insert(TestDataUtil.getRandomEvent());
-        User user = userDatabase.insert(TestDataUtil.getRandomUser());
+        Event event = eventRepository.save(TestDataUtil.getRandomEvent());
+        User user = userRepository.save(TestDataUtil.getRandomUser());
         var bookTicketRequestDto = new BookTicketRequestDto()
                 .setEventId(event.getId())
                 .setUserId(user.getId())
@@ -67,24 +66,25 @@ class TicketControllerIntTest {
 
         var result = mockMvc.perform(MockMvcRequestBuilders
                         .post("/tickets")
-                        .content(objectMapper.writeValueAsString(bookTicketRequestDto)))
+                        .content(objectMapper.writeValueAsString(bookTicketRequestDto))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        assertEquals(1, ticketDatabase.getData().size());
+        assertEquals(1, ticketRepository.findAll().size());
 
-        Ticket bookedTicket = ticketDatabase.getData().values().stream().findFirst().orElseThrow();
+        Ticket bookedTicket = ticketRepository.findAll().stream().findFirst().orElseThrow();
         result.andExpect(content().json(objectMapper.writeValueAsString(bookedTicket)));
     }
 
     @Test
     @SneakyThrows
     void shouldReturnTicketByEventId() {
-        Event event = eventDatabase.insert(TestDataUtil.getRandomEvent());
-        User user = userDatabase.insert(TestDataUtil.getRandomUser());
-        Ticket ticket = ticketDatabase.insert(TestDataUtil.getRandomBookedTicket(event.getId(), user.getId()));
+        Event event = eventRepository.save(TestDataUtil.getRandomEvent());
+        User user = userRepository.save(TestDataUtil.getRandomUser());
+        Ticket ticket = ticketRepository.save(TestDataUtil.getRandomBookedTicket(event, user));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/tickets?eventId=" + event.getId()))
+                        .get("/tickets/search?eventId=" + event.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(ticket))));
     }
@@ -92,12 +92,12 @@ class TicketControllerIntTest {
     @Test
     @SneakyThrows
     void shouldReturnTicketByUserId() {
-        Event event = eventDatabase.insert(TestDataUtil.getRandomEvent());
-        User user = userDatabase.insert(TestDataUtil.getRandomUser());
-        Ticket ticket = ticketDatabase.insert(TestDataUtil.getRandomBookedTicket(event.getId(), user.getId()));
+        Event event = eventRepository.save(TestDataUtil.getRandomEvent());
+        User user = userRepository.save(TestDataUtil.getRandomUser());
+        Ticket ticket = ticketRepository.save(TestDataUtil.getRandomBookedTicket(event, user));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/tickets?userId=" + user.getId()))
+                        .get("/tickets/search?userId=" + user.getId()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(List.of(ticket))));
     }
@@ -105,9 +105,9 @@ class TicketControllerIntTest {
     @Test
     @SneakyThrows
     void shouldCancelTicket() {
-        Event event = eventDatabase.insert(TestDataUtil.getRandomEvent());
-        User user = userDatabase.insert(TestDataUtil.getRandomUser());
-        Ticket ticket = ticketDatabase.insert(TestDataUtil.getRandomBookedTicket(event.getId(), user.getId()));
+        Event event = eventRepository.save(TestDataUtil.getRandomEvent());
+        User user = userRepository.save(TestDataUtil.getRandomUser());
+        Ticket ticket = ticketRepository.save(TestDataUtil.getRandomBookedTicket(event, user));
 
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/tickets/" + ticket.getId()))
@@ -118,8 +118,9 @@ class TicketControllerIntTest {
     @Test
     @SneakyThrows
     void shouldReturnBadRequest() {
+        UUID id = UUID.randomUUID();
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/tickets?eventId=0&userId=0")
+                        .get("/tickets/search?eventId="+ id + "&userId=" + id)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
@@ -128,7 +129,7 @@ class TicketControllerIntTest {
     @SneakyThrows
     void shouldReturnNotImplement() {
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/tickets")
+                        .get("/tickets/search")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotImplemented());
     }

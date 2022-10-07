@@ -7,6 +7,7 @@ import com.rntgroup.model.User;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Groups together all operations related to tickets booking.
@@ -18,7 +19,7 @@ public interface BookingFacade {
      * Gets event by its id.
      * @return Event.
      */
-    Event getEventById(long eventId);
+    Event getEventById(UUID eventId);
 
     /**
      * Get list of events by matching title. Title is matched using 'contains' approach.
@@ -59,13 +60,13 @@ public interface BookingFacade {
      * @param eventId Event id.
      * @return Flag that shows whether event has been deleted.
      */
-    boolean deleteEvent(long eventId);
+    boolean deleteEvent(UUID eventId);
 
     /**
      * Gets user by its id.
      * @return User.
      */
-    User getUserById(long userId);
+    User getUserById(UUID userId);
 
     /**
      * Gets user by its email. Email is strictly matched.
@@ -102,7 +103,7 @@ public interface BookingFacade {
      * @param userId User id.
      * @return Flag that shows whether user has been deleted.
      */
-    boolean deleteUser(long userId);
+    boolean deleteUser(UUID userId);
 
     /**
      * Book ticket for a specified event on behalf of specified user.
@@ -113,7 +114,7 @@ public interface BookingFacade {
      * @return Booked ticket object.
      * @throws java.lang.IllegalStateException if this place has already been booked.
      */
-    Ticket bookTicket(long userId, long eventId, int place, Category category);
+    Ticket bookTicket(UUID userId, UUID eventId, int place, Category category);
 
     /**
      * Get all booked tickets for specified user. Tickets should be sorted by event date in descending order.
@@ -138,6 +139,6 @@ public interface BookingFacade {
      * @param ticketId Ticket id.
      * @return Flag whether anything has been canceled.
      */
-    boolean cancelTicket(long ticketId);
+    boolean cancelTicket(UUID ticketId);
 
 }

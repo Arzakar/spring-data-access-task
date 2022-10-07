@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.UUID;
 
 @XmlRootElement
 @Data
@@ -13,7 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserXmlDto {
 
-    Long id;
+    UUID id;
     String name;
     String email;
 

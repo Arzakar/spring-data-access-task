@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/events")
@@ -31,11 +32,11 @@ public class EventController {
     BookingFacade bookingFacade;
 
     @GetMapping("/{id}")
-    public Event getEventById(@PathVariable("id") long id) {
+    public Event getEventById(@PathVariable("id") UUID id) {
         return bookingFacade.getEventById(id);
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public List<Event> getEvents(@RequestParam(name = "title", required = false) String title,
                                  @RequestParam(name = "day", required = false) String day,
                                  @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
@@ -71,7 +72,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteEvent(@PathVariable("id") long eventId) {
+    public boolean deleteEvent(@PathVariable("id") UUID eventId) {
         return bookingFacade.deleteEvent(eventId);
     }
 }

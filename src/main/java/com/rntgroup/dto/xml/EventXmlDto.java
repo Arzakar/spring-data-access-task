@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Date;
+import java.util.UUID;
 
 @XmlRootElement
 @Data
@@ -14,7 +15,7 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventXmlDto {
 
-    Long id;
+    UUID id;
     String title;
     Date date;
 

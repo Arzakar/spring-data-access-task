@@ -3,28 +3,32 @@ package com.rntgroup.service;
 import static java.util.Calendar.SEPTEMBER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.rntgroup.TestDataUtil;
 import com.rntgroup.TestUtil;
 import com.rntgroup.exception.NotFoundException;
 import com.rntgroup.model.Event;
 import com.rntgroup.repository.EventRepository;
-import com.rntgroup.repository.util.Page;
-import com.rntgroup.repository.util.SearchResult;
 
-import com.rntgroup.service.EventService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 class EventServiceTest {
@@ -38,83 +42,92 @@ class EventServiceTest {
     @Test
     @DisplayName("Должен сохранить Event в БД и вернуть сохранённый объект")
     void shouldCreateEvent() {
-        Event testEvent = new Event(0L, "TestEvent", new Date());
+        Event event = TestDataUtil.getRandomEvent();
 
-        when(eventRepository.save(any(Event.class))).thenReturn(testEvent);
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
 
-        assertEquals(testEvent, eventService.create(testEvent));
-        verify(eventRepository).save(testEvent);
+        assertEquals(event, eventService.create(event));
+        verify(eventRepository).save(event);
     }
 
     @Test
     @DisplayName("Должен вернуть Event из БД, найденный по id")
     void shouldReturnEventById() {
-        Event testEvent = new Event(0L, "TestEvent", new Date());
+        UUID id = UUID.randomUUID();
+        Event event = TestDataUtil.getRandomEvent(id);
 
-        when(eventRepository.findById(any(Long.class))).thenReturn(Optional.of(testEvent));
+        when(eventRepository.findById(any(UUID.class))).thenReturn(Optional.of(event));
 
-        assertEquals(testEvent, eventService.findById(0L));
-        verify(eventRepository).findById(0L);
+        assertEquals(event, eventService.findById(id));
+        verify(eventRepository).findById(id);
     }
 
     @Test
     @DisplayName("Должен выбросить исключение, т.к. Event с заданным id не найден")
     void shouldThrowExceptionBecauseEventByIdNotFound() {
-        NotFoundException expectedException = new NotFoundException("Event with id = 0 not found");
+        UUID id = UUID.randomUUID();
+        NotFoundException expectedException = new NotFoundException(String.format("Event with id = %s not found", id));
 
-        when(eventRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+        when(eventRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
 
-        NotFoundException thrown = assertThrows(NotFoundException.class, () -> eventService.findById(0L));
-        verify(eventRepository).findById(0L);
+        NotFoundException thrown = assertThrows(NotFoundException.class, () -> eventService.findById(id));
+        verify(eventRepository).findById(id);
         assertEquals(expectedException.getMessage(), thrown.getMessage());
     }
 
     @Test
     @DisplayName("Должен вернуть список, содержащий Events с одинаковыми названиями с определённой страницы")
     void shouldReturnEventsByTitle() {
-        List<Event> testEvents = List.of(new Event(0L, "TestEvent", new Date()),
-                new Event(1L, "TestEvent", new Date()));
+        String title = "Some";
+        List<Event> events = List.of(
+                new Event().setTitle(title),
+                new Event().setTitle(title)
+        );
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "title");
 
-        when(eventRepository.findByTitle(any(String.class), any(Page.class)))
-                .thenReturn(new SearchResult<Event>().setContent(testEvents).setPage(Page.of(2, 1)));
+        when(eventRepository.findByTitle(any(String.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(events, pageRequest, events.size()));
 
-        assertEquals(testEvents, eventService.findByTitle("TestEvent", 2, 1));
-        verify(eventRepository).findByTitle("TestEvent", Page.of(2, 1));
+        assertEquals(events, eventService.findByTitle(title,  pageRequest.getPageSize(), pageRequest.getPageNumber()));
+        verify(eventRepository).findByTitle(title, pageRequest);
     }
 
     @Test
     @DisplayName("Должен вернуть список, содержащий Events с одинаковыми датами с определённой страницы")
     void shouldReturnEventsByDate() {
-        Date testDate = TestUtil.createDate(2022, SEPTEMBER, 5);
-        List<Event> testEvents = List.of(new Event(0L, "TestEvent_01", testDate),
-                new Event(1L, "TestEvent_02", testDate));
+        Date date = TestUtil.createDate(2022, SEPTEMBER, 5);
+        List<Event> events = List.of(
+                new Event().setDate(date),
+                new Event().setDate(date)
+        );
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "date");
 
-        when(eventRepository.findByDate(any(Date.class), any(Page.class)))
-                .thenReturn(new SearchResult<Event>().setContent(testEvents).setPage(Page.of(2, 1)));
+        when(eventRepository.findByDate(any(Date.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(events, pageRequest, events.size()));
 
-        assertEquals(testEvents, eventService.findByDate(testDate, 2, 1));
-        verify(eventRepository).findByDate(testDate, Page.of(2, 1));
+        assertEquals(events, eventService.findByDate(date, pageRequest.getPageSize(), pageRequest.getPageNumber()));
+        verify(eventRepository).findByDate(date, pageRequest);
     }
 
     @Test
     @DisplayName("Должен обновить Event в БД и вернуть обновлённый объект")
     void shouldUpdateEvent() {
-        Event testEvent = new Event(2L, "UpdatedTestEvent", new Date());
+        Event event = TestDataUtil.getRandomEvent();
 
-        when(eventRepository.update(any(Event.class))).thenReturn(testEvent);
+        when(eventRepository.save(any(Event.class))).thenReturn(event);
 
-        assertEquals(testEvent, eventService.update(testEvent));
-        verify(eventRepository).update(testEvent);
+        assertEquals(event, eventService.update(event));
+        verify(eventRepository).save(event);
     }
 
     @Test
     @DisplayName("Должен удалить Event из БД и вернуть удалённый объект")
     void shouldDeleteEventById() {
-        Event testEvent = new Event(0L, "DeletedTestEvent", new Date());
+        UUID id = UUID.randomUUID();
 
-        when(eventRepository.deleteById(any(Long.class))).thenReturn(testEvent);
+        when(eventRepository.existsById(any(UUID.class))).thenReturn(false);
 
-        assertEquals(testEvent, eventService.deleteById(0L));
-        verify(eventRepository).deleteById(0L);
+        assertTrue(eventService.deleteById(id));
+        verify(eventRepository).deleteById(id);
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -29,11 +30,11 @@ public class UserController {
     BookingFacade bookingFacade;
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable("id") long userId) {
+    public User getUserById(@PathVariable("id") UUID userId) {
         return bookingFacade.getUserById(userId);
     }
 
-    @GetMapping
+    @GetMapping("/search")
     public List<User> getUsers(@RequestParam(name = "email", required = false) String email,
                                @RequestParam(name = "name", required = false) String name,
                                @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize,
@@ -65,7 +66,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public boolean deleteUser(@PathVariable("id") long userId) {
+    public boolean deleteUser(@PathVariable("id") UUID userId) {
         return bookingFacade.deleteUser(userId);
     }
 
