@@ -6,16 +6,19 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.UUID;
 
+@XmlRootElement
 @Data
 @Accessors(chain = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BookTicketRequestDto {
+public class TicketDto {
 
-    UUID userId;
+    UUID id;
     UUID eventId;
-    int place;
+    UUID userId;
     Category category;
+    Integer place;
 
 }

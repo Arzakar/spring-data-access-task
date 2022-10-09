@@ -1,147 +1,255 @@
 package com.rntgroup.facade;
 
+import com.rntgroup.dto.EventDto;
+import com.rntgroup.dto.TicketDto;
+import com.rntgroup.dto.UserAccountDto;
+import com.rntgroup.dto.UserDto;
+import com.rntgroup.dto.EventDtoList;
+import com.rntgroup.dto.TicketDtoList;
+import com.rntgroup.dto.UserDtoList;
 import com.rntgroup.enumerate.Category;
+import com.rntgroup.mapper.EventMapper;
+import com.rntgroup.mapper.TicketMapper;
+import com.rntgroup.mapper.UserAccountMapper;
+import com.rntgroup.mapper.UserMapper;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
 import com.rntgroup.model.UserAccount;
+import com.rntgroup.service.EventService;
+import com.rntgroup.service.TicketService;
+import com.rntgroup.service.UserAccountService;
+import com.rntgroup.service.UserService;
+import com.rntgroup.util.FileReader;
+import com.rntgroup.util.MarshallerWrapper;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-/**
- * Groups together all operations related to tickets booking.
- * Created by maksym_govorischev.
- */
-public interface BookingFacade {
+@Slf4j
+@Component
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class BookingFacade {
 
-    /**
-     * Gets event by its id.
-     * @return Event.
-     */
-    Event getEventById(UUID eventId);
+    EventService eventService;
+    TicketService ticketService;
+    UserService userService;
+    UserAccountService userAccountService;
 
-    /**
-     * Get list of events by matching title. Title is matched using 'contains' approach.
-     * In case nothing was found, empty list is returned.
-     * @param title Event title or it's part.
-     * @param pageSize Pagination param. Number of events to return on a page.
-     * @param pageNum Pagination param. Number of the page to return. Starts from 1.
-     * @return List of events.
-     */
-    List<Event> getEventsByTitle(String title, int pageSize, int pageNum);
+    EventMapper eventMapper;
+    TicketMapper ticketMapper;
+    UserMapper userMapper;
+    UserAccountMapper userAccountMapper;
 
-    /**
-     * Get list of events for specified day.
-     * In case nothing was found, empty list is returned.
-     * @param day Date object from which day information is extracted.
-     * @param pageSize Pagination param. Number of events to return on a page.
-     * @param pageNum Pagination param. Number of the page to return. Starts from 1.
-     * @return List of events.
-     */
-    List<Event> getEventsForDay(Date day, int pageSize, int pageNum);
+    MarshallerWrapper marshallerWrapper;
 
-    /**
-     * Creates new event. Event id should be auto-generated.
-     * @param event Event data.
-     * @return Created Event object.
-     */
-    Event createEvent(Event event);
+    //@Override
+    public EventDto getEventById(UUID eventId) {
+        log.info("Method {}#getEventById was called with param: eventId = {}", this.getClass().getSimpleName(), eventId);
 
-    /**
-     * Updates event using given data.
-     * @param event Event data for update. Should have id set.
-     * @return Updated Event object.
-     */
-    Event updateEvent(Event event);
+        Event event = eventService.findById(eventId);
+        return eventMapper.toDto(event);
+    }
 
-    /**
-     * Deletes event by its id.
-     * @param eventId Event id.
-     * @return Flag that shows whether event has been deleted.
-     */
-    boolean deleteEvent(UUID eventId);
+    //@Override
+    public List<EventDto> getEventsByTitle(String title, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
+        log.info("Method {}#getEventsByTitle was called with params: title = {}, pageSize = {}, pageNum = {}",
+                this.getClass().getSimpleName(), title, pageSize, pageNum);
 
-    /**
-     * Gets user by its id.
-     * @return User.
-     */
-    User getUserById(UUID userId);
+        PageRequest pageRequest = PageRequest.of(pageNumOffset(pageNum), pageSize, direction, sortParam);
+        List<Event> events = eventService.findByTitle(title, pageRequest);
+        return events.stream()
+                .map(eventMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
-    /**
-     * Gets user by its email. Email is strictly matched.
-     * @return User.
-     */
-    User getUserByEmail(String email);
+    //@Override
+    public List<EventDto> getEventsForDay(LocalDate day, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
+        log.info("Method {}#getEventsForDay was called with params: day = {}, pageSize = {}, pageNum = {}",
+                this.getClass().getSimpleName(), day, pageSize, pageNum);
 
-    /**
-     * Get list of users by matching name. Name is matched using 'contains' approach.
-     * In case nothing was found, empty list is returned.
-     * @param name Users name or it's part.
-     * @param pageSize Pagination param. Number of users to return on a page.
-     * @param pageNum Pagination param. Number of the page to return. Starts from 1.
-     * @return List of users.
-     */
-    List<User> getUsersByName(String name, int pageSize, int pageNum);
+        PageRequest pageRequest = PageRequest.of(pageNumOffset(pageNum), pageSize, direction, sortParam);
+        List<Event> events = eventService.findByDate(day, pageRequest);
+        return events.stream()
+                .map(eventMapper::toDto)
+                .collect(Collectors.toList());
+    }
 
-    /**
-     * Creates new user. User id should be auto-generated.
-     * @param user User data.
-     * @return Created User object.
-     */
-    User createUser(User user);
+    //@Override
+    public EventDto createEvent(EventDto event) {
+        log.info("Method {}#createEvent was called with param: event = {}", this.getClass().getSimpleName(), event);
 
-    /**
-     * Updates user using given data.
-     * @param user User data for update. Should have id set.
-     * @return Updated User object.
-     */
-    User updateUser(User user);
+        Event createdEvent = eventService.create(eventMapper.toModel(event));
+        return eventMapper.toDto(createdEvent);
+    }
 
-    /**
-     * Deletes user by its id.
-     * @param userId User id.
-     * @return Flag that shows whether user has been deleted.
-     */
-    boolean deleteUser(UUID userId);
+    //@Override
+    public EventDto updateEvent(EventDto event) {
+        log.info("Method {}#updateEvent was called with param: event = {}", this.getClass().getSimpleName(), event);
 
-    /**
-     * Book ticket for a specified event on behalf of specified user.
-     * @param userId User Id.
-     * @param eventId Event Id.
-     * @param place Place number.
-     * @param category Service category.
-     * @return Booked ticket object.
-     * @throws java.lang.IllegalStateException if this place has already been booked.
-     */
-    Ticket bookTicket(UUID userId, UUID eventId, int place, Category category);
+        Event updatedEvent = eventService.update(eventMapper.toModel(event));
+        return eventMapper.toDto(updatedEvent);
+    }
 
-    /**
-     * Get all booked tickets for specified user. Tickets should be sorted by event date in descending order.
-     * @param user User
-     * @param pageSize Pagination param. Number of tickets to return on a page.
-     * @param pageNum Pagination param. Number of the page to return. Starts from 1.
-     * @return List of Ticket objects.
-     */
-    List<Ticket> getBookedTickets(User user, int pageSize, int pageNum);
+    //@Override
+    public boolean deleteEvent(UUID eventId) {
+        log.info("Method {}#deleteEvent was called with param: eventId = {}", this.getClass().getSimpleName(), eventId);
 
-    /**
-     * Get all booked tickets for specified event. Tickets should be sorted in by user email in ascending order.
-     * @param event Event
-     * @param pageSize Pagination param. Number of tickets to return on a page.
-     * @param pageNum Pagination param. Number of the page to return. Starts from 1.
-     * @return List of Ticket objects.
-     */
-    List<Ticket> getBookedTickets(Event event, int pageSize, int pageNum);
+        return eventService.deleteById(eventId);
+    }
 
-    /**
-     * Cancel ticket with a specified id.
-     * @param ticketId Ticket id.
-     * @return Flag whether anything has been canceled.
-     */
-    boolean cancelTicket(UUID ticketId);
+    //@Override
+    public UserDto getUserById(UUID userId) {
+        log.info("Method {}#getUserById was called with param: userId = {}", this.getClass().getSimpleName(), userId);
 
-    UserAccount replenishAccount(UUID userId, BigDecimal amount);
+        User user = userService.findById(userId);
+        return userMapper.toDto(user);
+    }
+
+    //@Override
+    public UserDto getUserByEmail(String email) {
+        log.info("Method {}#getUserByEmail was called with param: email = {}", this.getClass().getSimpleName(), email);
+
+        User user = userService.findByEmail(email);
+        return userMapper.toDto(user);
+    }
+
+    //@Override
+    public List<UserDto> getUsersByName(String name, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
+        log.info("Method {}#getUsersByName was called with params: name = {}, pageSize = {}, pageNum = {}",
+                this.getClass().getSimpleName(), name, pageSize, pageNum);
+
+        PageRequest pageRequest = PageRequest.of(pageNumOffset(pageNum), pageSize, direction, sortParam);
+        List<User> users = userService.findByName(name, pageRequest);
+        return users.stream()
+                .map(userMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    //@Override
+    public UserDto createUser(UserDto user) {
+        log.info("Method {}#createUser was called with param: user = {}", this.getClass().getSimpleName(), user);
+
+        User createdUser = userService.create(userMapper.toModel(user));
+        return userMapper.toDto(createdUser);
+    }
+
+    //@Override
+    public UserDto updateUser(UserDto user) {
+        log.info("Method {}#updateUser was called with param: user = {}", this.getClass().getSimpleName(), user);
+
+        User updatedUser = userService.update(userMapper.toModel(user));
+        return userMapper.toDto(updatedUser);
+    }
+
+    //@Override
+    public boolean deleteUser(UUID userId) {
+        log.info("Method {}#userId was called with param: userId = {}", this.getClass().getSimpleName(), userId);
+
+        return userService.deleteById(userId);
+    }
+
+    //@Override
+    public TicketDto bookTicket(UUID userId, UUID eventId, int place, Category category) {
+        log.info("Method {}#bookTicket was called with params: userId = {}, eventId = {}, place = {}, category = {}",
+                this.getClass().getSimpleName(), userId, eventId, place, category);
+
+        Event event = eventService.findById(eventId);
+        User user = userService.findById(userId);
+        Ticket bookedTicket = ticketService.create(
+                new Ticket().setEvent(event)
+                        .setUser(user)
+                        .setCategory(category)
+                        .setPlace(place)
+        );
+
+        return ticketMapper.toDto(bookedTicket);
+    }
+
+    //@Override
+    public List<TicketDto> getBookedTickets(UserDto userDto, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
+        log.info("Method {}#getBookedTickets was called with params: userId = {}, pageSize = {}, pageNum = {}",
+                this.getClass().getSimpleName(), userDto.getId(), pageSize, pageNum);
+
+        PageRequest pageRequest = PageRequest.of(pageNumOffset(pageNum), pageSize, direction, sortParam);
+        List<Ticket> tickets = ticketService.findByUserId(userDto.getId(), pageRequest);
+        return tickets.stream()
+                .map(ticketMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    //@Override
+    public List<TicketDto> getBookedTickets(EventDto eventDto, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
+        log.info("Method {}#getBookedTickets was called with params: eventId = {}, pageSize = {}, pageNum = {}",
+                this.getClass().getSimpleName(), eventDto.getId(), pageSize, pageNum);
+
+        PageRequest pageRequest = PageRequest.of(pageNumOffset(pageNum), pageSize, direction, sortParam);
+        List<Ticket> tickets = ticketService.findByEventId(eventDto.getId(), pageRequest);
+        return tickets.stream()
+                .map(ticketMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    //@Override
+    public boolean cancelTicket(UUID ticketId) {
+        log.info("Method {}#cancelTicket was called with param: ticketId = {}", this.getClass().getSimpleName(), ticketId);
+
+        return ticketService.deleteById(ticketId);
+    }
+
+    //@Override
+    public UserAccountDto replenishAccount(UUID userId, BigDecimal amount) {
+        UserAccount userAccount = userAccountService.replenish(userId, amount);
+        return userAccountMapper.toDto(userAccount);
+    }
+
+    public void preloadTickets() throws IOException {
+        Charset utf8 = StandardCharsets.UTF_8;
+
+        InputStream usersInputStream = new ByteArrayInputStream(
+                FileReader.readResourceAsString("init-data/users.xml").getBytes(utf8)
+        );
+        UserDtoList users = marshallerWrapper.unmarshall(usersInputStream, UserDtoList.class);
+        users.getUsers().stream()
+                .map(userMapper::toModel)
+                .forEach(userService::create);
+
+        InputStream eventsInputStream = new ByteArrayInputStream(
+                FileReader.readResourceAsString("init-data/events.xml").getBytes(utf8)
+        );
+        EventDtoList events = marshallerWrapper.unmarshall(eventsInputStream, EventDtoList.class);
+        events.getEvents().stream()
+                .map(eventMapper::toModel)
+                .forEach(eventService::create);
+
+        InputStream ticketsInputStream = new ByteArrayInputStream(
+                FileReader.readResourceAsString("init-data/tickets.xml").getBytes(utf8)
+        );
+        TicketDtoList tickets = marshallerWrapper.unmarshall(ticketsInputStream, TicketDtoList.class);
+        tickets.getTickets().stream()
+                .map(ticketMapper::toModel)
+                .forEach(ticketService::create);
+    }
+
+    private int pageNumOffset(int pageNum) {
+        return pageNum > 0 ? pageNum - 1 : 0;
+    }
 }

@@ -1,16 +1,20 @@
 package com.rntgroup.facade;
 
 import static com.rntgroup.enumerate.Category.PREMIUM;
-import static com.rntgroup.enumerate.Category.STANDARD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.rntgroup.TestDataUtil;
-import com.rntgroup.exception.BadRequestException;
-import com.rntgroup.model.Event;
-import com.rntgroup.model.Ticket;
-import com.rntgroup.model.User;
+import com.rntgroup.dto.EventDto;
+import com.rntgroup.dto.TicketDto;
+import com.rntgroup.dto.UserDto;
+import com.rntgroup.enumerate.Category;
+import com.rntgroup.exception.ValidationException;
+import com.rntgroup.mapper.EventMapper;
+import com.rntgroup.mapper.TicketMapper;
+import com.rntgroup.mapper.UserMapper;
 
 import com.rntgroup.repository.EventRepository;
 import com.rntgroup.repository.TicketRepository;
@@ -20,14 +24,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@Transactional
 class BookFacadeIntTest {
 
     @Autowired
@@ -37,97 +41,97 @@ class BookFacadeIntTest {
     private EventRepository eventRepository;
 
     @Autowired
+    private EventMapper eventMapper;
+
+    @Autowired
     private TicketRepository ticketRepository;
+
+    @Autowired
+    private TicketMapper ticketMapper;
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @BeforeEach
     void setUp() {
         eventRepository.deleteAll();
-        ticketRepository.deleteAll();
         userRepository.deleteAll();
+        ticketRepository.deleteAll();
     }
 
     @Test
     @DisplayName("Билет успешно забронирован")
     void bookTicketHappyPath() {
-        int pageSize = 10;
-        int pageNum = 1;
-
         // создание мероприятия
-        Event event = bookingFacade.createEvent(TestDataUtil.getRandomEvent());
-        assertEquals(1, bookingFacade.getEventsByTitle(event.getTitle(), pageSize, pageNum).size());
-        assertEquals(event, eventRepository.findById(event.getId()).orElseThrow());
+        EventDto eventDto = bookingFacade.createEvent(TestDataUtil.getRandomEventDto());
+        assertEquals(eventMapper.toModel(eventDto), eventRepository.findById(eventDto.getId()).orElseThrow());
+        assertEquals(1, eventRepository.findAll().size());
 
         // создание пользователя
-        User user = bookingFacade.createUser(TestDataUtil.getRandomUser());
-        assertEquals(1, bookingFacade.getUsersByName(user.getName(), pageSize, pageNum).size());
-        assertEquals(user, userRepository.findById(user.getId()).orElseThrow());
+        UserDto userDto = bookingFacade.createUser(TestDataUtil.getRandomUserDto());
+        assertEquals(userMapper.toModel(userDto), userRepository.findById(userDto.getId()).orElseThrow());
+        assertEquals(1, userRepository.findAll().size());
 
         // бронирование билета
-        Ticket bookedTicket = bookingFacade.bookTicket(user.getId(), event.getId(), 5, PREMIUM);
-        assertEquals(1, bookingFacade.getBookedTickets(event, pageSize, pageNum).size());
-        assertEquals(bookedTicket, ticketRepository.findById(bookedTicket.getId()).orElseThrow());
+        TicketDto bookedTicketDto = bookingFacade.bookTicket(userDto.getId(), eventDto.getId(), 5, Category.BAR);
+        assertEquals(ticketMapper.toModel(bookedTicketDto), ticketRepository.findById(bookedTicketDto.getId()).orElseThrow());
+        assertEquals(1, ticketRepository.findAll().size());
     }
 
     @Test
     @DisplayName("Забронировано несколько билетов, один отменён")
     void cancelTicketHappyPath() {
-        int pageSize = 10;
-        int pageNum = 1;
-
         // создание мероприятия
-        Event event = bookingFacade.createEvent(TestDataUtil.getRandomEvent());
-        assertEquals(1, bookingFacade.getEventsByTitle(event.getTitle(), pageSize, pageNum).size());
-        assertEquals(event, eventRepository.findById(event.getId()).orElseThrow());
+        EventDto eventDto = bookingFacade.createEvent(TestDataUtil.getRandomEventDto());
+        assertEquals(eventMapper.toModel(eventDto), eventRepository.findById(eventDto.getId()).orElseThrow());
+        assertEquals(1, eventRepository.findAll().size());
 
         // создание пользователя
-        User user = bookingFacade.createUser(TestDataUtil.getRandomUser());
-        assertEquals(1, bookingFacade.getUsersByName(user.getName(), pageSize, pageNum).size());
-        assertEquals(user, userRepository.findById(user.getId()).orElseThrow());
+        UserDto userDto = bookingFacade.createUser(TestDataUtil.getRandomUserDto());
+        assertEquals(userMapper.toModel(userDto), userRepository.findById(userDto.getId()).orElseThrow());
+        assertEquals(1, userRepository.findAll().size());
 
         // бронирование первого билета
-        Ticket firstBookedTicket = bookingFacade.bookTicket(user.getId(), event.getId(), 5, PREMIUM);
-        assertEquals(1, bookingFacade.getBookedTickets(event, pageSize, pageNum).size());
-        assertEquals(firstBookedTicket, ticketRepository.findById(firstBookedTicket.getId()).orElseThrow());
+        TicketDto firstBookedTicketDto = bookingFacade.bookTicket(userDto.getId(), eventDto.getId(), 5, Category.BAR);
+        assertEquals(ticketMapper.toModel(firstBookedTicketDto), ticketRepository.findById(firstBookedTicketDto.getId()).orElseThrow());
+        assertEquals(1, ticketRepository.findAll().size());
 
         // бронирование второго билета
-        Ticket secondBookedTicket = bookingFacade.bookTicket(user.getId(), event.getId(), 6, STANDARD);
-        assertEquals(2, bookingFacade.getBookedTickets(event, pageSize, pageNum).size());
-        assertEquals(secondBookedTicket, ticketRepository.findById(secondBookedTicket.getId()).orElseThrow());
+        TicketDto secondBookedTicketDto = bookingFacade.bookTicket(userDto.getId(), eventDto.getId(), 6, Category.BAR);
+        assertEquals(ticketMapper.toModel(secondBookedTicketDto), ticketRepository.findById(secondBookedTicketDto.getId()).orElseThrow());
+        assertEquals(2, ticketRepository.findAll().size());
 
-        // отмена бронирования
-        assertTrue(bookingFacade.cancelTicket(secondBookedTicket.getId()));
-        assertEquals(1, bookingFacade.getBookedTickets(event, pageSize, pageNum).size());
-        assertEquals(1, bookingFacade.getBookedTickets(user, pageSize, pageNum).size());
+        // отмена бронирования второго билета
+        assertTrue(bookingFacade.cancelTicket(secondBookedTicketDto.getId()));
+        assertEquals(1, ticketRepository.findAll().size());
+        assertNotNull(ticketRepository.findById(firstBookedTicketDto.getId()));
     }
 
     @Test
     @DisplayName("Забронировать билет не получилось. т.к. место уже занято")
     void bookTicketFailPath() {
-        int pageSize = 10;
-        int pageNum = 1;
-
         // создание мероприятия
-        Event event = bookingFacade.createEvent(TestDataUtil.getRandomEvent());
-        assertEquals(1, bookingFacade.getEventsByTitle(event.getTitle(), pageSize, pageNum).size());
-        assertEquals(event, eventRepository.findById(event.getId()).orElseThrow());
+        EventDto eventDto = bookingFacade.createEvent(TestDataUtil.getRandomEventDto());
+        assertEquals(eventMapper.toModel(eventDto), eventRepository.findById(eventDto.getId()).orElseThrow());
+        assertEquals(1, eventRepository.findAll().size());
 
         // создание пользователя
-        User user = bookingFacade.createUser(TestDataUtil.getRandomUser());
-        assertEquals(1, bookingFacade.getUsersByName(user.getName(), pageSize, pageNum).size());
-        assertEquals(user, userRepository.findById(user.getId()).orElseThrow());
+        UserDto userDto = bookingFacade.createUser(TestDataUtil.getRandomUserDto());
+        assertEquals(userMapper.toModel(userDto), userRepository.findById(userDto.getId()).orElseThrow());
+        assertEquals(1, userRepository.findAll().size());
 
         // бронирование первого билета
-        Ticket firstBookedTicket = bookingFacade.bookTicket(user.getId(), event.getId(), 5, PREMIUM);
-        assertEquals(1, bookingFacade.getBookedTickets(event, pageSize, pageNum).size());
-        assertEquals(firstBookedTicket, ticketRepository.findById(firstBookedTicket.getId()).orElseThrow());
+        TicketDto firstBookedTicketDto = bookingFacade.bookTicket(userDto.getId(), eventDto.getId(), 5, Category.BAR);
+        assertEquals(ticketMapper.toModel(firstBookedTicketDto), ticketRepository.findById(firstBookedTicketDto.getId()).orElseThrow());
+        assertEquals(1, ticketRepository.findAll().size());
 
         // бронирование второго билета
-        UUID userId = user.getId();
-        UUID eventId = event.getId();
-        var thrown = assertThrows(BadRequestException.class, () ->
+        UUID eventId = eventDto.getId();
+        UUID userId = userDto.getId();
+        var thrown = assertThrows(ValidationException.class, () ->
                 bookingFacade.bookTicket(userId, eventId, 5, PREMIUM));
         assertEquals("Ticket with place = 5 already exist", thrown.getMessage());
     }

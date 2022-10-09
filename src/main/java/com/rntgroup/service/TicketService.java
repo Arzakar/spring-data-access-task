@@ -1,17 +1,14 @@
 package com.rntgroup.service;
 
-import com.rntgroup.exception.BadRequestException;
+import com.rntgroup.exception.ValidationException;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.repository.TicketRepository;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,32 +26,29 @@ public class TicketService {
         log.debug("Method {}#create was called with param: ticket = {}", this.getClass().getSimpleName(), ticket);
 
         if (ticketRepository.findByEventIdAndPlace(ticket.getEvent().getId(), ticket.getPlace()).isPresent()) {
-            var error = new BadRequestException(String.format("Ticket with place = %d already exist", ticket.getPlace()));
-            log.error("Method {}#create returned error with message: {}", this.getClass().getSimpleName(), error.getMessage());
-            throw error;
+            throw new ValidationException(String.format("Ticket with place = %d already exist", ticket.getPlace()));
         }
 
         return ticketRepository.save(ticket);
     }
 
-    public List<Ticket> findByUserId(UUID userId, int pageSize, int pageNum) {
-        log.debug("Method {}#findByUser was called with params: userId = {}, pageSize = {}, pageNum = {}",
-                this.getClass().getSimpleName(), userId, pageSize, pageNum);
+    public List<Ticket> findByUserId(UUID userId, Pageable pageable) {
+        log.debug("Method {}#findByUser was called with params: userId = {}, pageable = {}",
+                this.getClass().getSimpleName(), userId, pageable);
 
-        PageRequest pageRequest = PageRequest.of(pageNum, pageSize, Sort.Direction.ASC, "event");
-        return ticketRepository.findByUserId(userId, pageRequest).getContent();
+        return ticketRepository.findByUserId(userId, pageable).getContent();
     }
 
-    public List<Ticket> findByEventId(UUID eventId, int pageSize, int pageNum) {
-        log.debug("Method {}#findByEvent was called with params: eventId = {}, pageSize = {}, pageNum = {}",
-                this.getClass().getSimpleName(), eventId, pageSize, pageNum);
+    public List<Ticket> findByEventId(UUID eventId, Pageable pageable) {
+        log.debug("Method {}#findByEvent was called with params: eventId = {}, pageable = {}",
+                this.getClass().getSimpleName(), eventId, pageable);
 
-        PageRequest pageRequest = PageRequest.of(pageNum, pageSize, Sort.Direction.ASC, "user");
-        return ticketRepository.findByEventId(eventId, pageRequest).getContent();
+        return ticketRepository.findByEventId(eventId, pageable).getContent();
     }
 
     public boolean deleteById(UUID id) {
         log.debug("Method {}#deleteById was called with param: id = {}", this.getClass().getSimpleName(), id);
+
         ticketRepository.deleteById(id);
         return !ticketRepository.existsById(id);
     }

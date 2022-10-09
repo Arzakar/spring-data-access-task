@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<userXmlDtoList>
-    <userXmlDto>
+<userDtoList>
+    <userDto>
         <email>andrey_k@yandex.ru</email>
         <id>0</id>
         <name>Андрей</name>
-    </userXmlDto>
-    <userXmlDto>
+    </userDto>
+    <userDto>
         <email>igoriok@mail.ru</email>
         <id>1</id>
         <name>Игорь</name>
-    </userXmlDto>
-    <userXmlDto>
+    </userDto>
+    <userDto>
         <email>nusha.from.moscow@google.com</email>
         <id>2</id>
         <name>Анастасия</name>
-    </userXmlDto>
-    <userXmlDto>
+    </userDto>
+    <userDto>
         <email>flawless_victory@ya.ru</email>
         <id>3</id>
         <name>Виктория</name>
-    </userXmlDto>
-    <userXmlDto>
+    </userDto>
+    <userDto>
         <email>beer_lover@google.com</email>
         <id>4</id>
         <name>Игорь</name>
-    </userXmlDto>
-    <userXmlDto>
+    </userDto>
+    <userDto>
         <email>stepan.climashin@mail.com</email>
         <id>5</id>
         <name>Степан</name>
-    </userXmlDto>
-    <userXmlDto>
+    </userDto>
+    <userDto>
         <email>markdown@github.com</email>
         <id>6</id>
         <name>Марк</name>
-    </userXmlDto>
-</userXmlDtoList>
+    </userDto>
+</userDtoList>

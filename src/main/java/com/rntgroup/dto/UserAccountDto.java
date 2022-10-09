@@ -1,4 +1,4 @@
-package com.rntgroup.dto.xml;
+package com.rntgroup.dto;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -6,16 +6,17 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @XmlRootElement
 @Data
 @Accessors(chain = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserXmlDto {
+public class UserAccountDto {
 
     UUID id;
-    String name;
-    String email;
+    UUID userId;
+    BigDecimal amount;
 
 }

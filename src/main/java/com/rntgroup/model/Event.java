@@ -19,7 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -43,7 +43,7 @@ public class Event {
     String title;
 
     @Column(name = "date", nullable = false)
-    Date date;
+    LocalDate date;
 
     @Column(name = "price", nullable = false)
     BigDecimal price;

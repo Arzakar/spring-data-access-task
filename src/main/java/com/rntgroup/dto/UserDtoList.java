@@ -1,4 +1,4 @@
-package com.rntgroup.dto.xml;
+package com.rntgroup.dto;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -12,9 +12,9 @@ import java.util.List;
 @XmlRootElement
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UserXmlDtoList {
+public class UserDtoList {
 
-    @XmlElement(name = "userXmlDto", type = UserXmlDto.class)
-    List<UserXmlDto> users = new ArrayList<>();
+    @XmlElement(name = "userDto", type = UserDto.class)
+    List<UserDto> users = new ArrayList<>();
 
 }

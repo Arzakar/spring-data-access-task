@@ -1,11 +1,11 @@
 package com.rntgroup.configuration;
 
-import com.rntgroup.dto.xml.EventXmlDto;
-import com.rntgroup.dto.xml.EventXmlDtoList;
-import com.rntgroup.dto.xml.TicketXmlDto;
-import com.rntgroup.dto.xml.TicketXmlDtoList;
-import com.rntgroup.dto.xml.UserXmlDto;
-import com.rntgroup.dto.xml.UserXmlDtoList;
+import com.rntgroup.dto.EventDto;
+import com.rntgroup.dto.TicketDto;
+import com.rntgroup.dto.UserDto;
+import com.rntgroup.dto.EventDtoList;
+import com.rntgroup.dto.TicketDtoList;
+import com.rntgroup.dto.UserDtoList;
 import com.rntgroup.enumerate.Category;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,12 +18,12 @@ public class Jaxb2MarshallerConfiguration {
     public Jaxb2Marshaller jaxb2Marshaller() {
         final var jaxb2Marshaller = new Jaxb2Marshaller();
         jaxb2Marshaller.setClassesToBeBound(
-                EventXmlDto.class,
-                EventXmlDtoList.class,
-                TicketXmlDto.class,
-                TicketXmlDtoList.class,
-                UserXmlDto.class,
-                UserXmlDtoList.class,
+                EventDto.class,
+                EventDtoList.class,
+                TicketDto.class,
+                TicketDtoList.class,
+                UserDto.class,
+                UserDtoList.class,
                 Category.class
         );
         return jaxb2Marshaller;

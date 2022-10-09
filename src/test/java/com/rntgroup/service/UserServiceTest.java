@@ -1,5 +1,6 @@
 package com.rntgroup.service;
 
+import static com.rntgroup.TestDataUtil.DEFAULT_PAGE_REQUEST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -19,9 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Optional;
@@ -80,13 +79,12 @@ class UserServiceTest {
                 new User().setName(name),
                 new User().setName(name)
         );
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "name");
 
         when(userRepository.findByName(any(String.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(users, pageRequest, users.size()));
+                .thenReturn(new PageImpl<>(users, DEFAULT_PAGE_REQUEST, users.size()));
 
-        assertEquals(users, userService.findByName(name, pageRequest.getPageSize(), pageRequest.getPageNumber()));
-        verify(userRepository).findByName(name, pageRequest);
+        assertEquals(users, userService.findByName(name, DEFAULT_PAGE_REQUEST));
+        verify(userRepository).findByName(name, DEFAULT_PAGE_REQUEST);
     }
 
     @Test

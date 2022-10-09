@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ticketXmlDtoList>
-    <ticketXmlDto>
+<ticketDtoList>
+    <ticketDto>
         <category>BAR</category>
         <eventId>2</eventId>
         <id>0</id>
         <place>1</place>
         <userId>1</userId>
-    </ticketXmlDto>
-    <ticketXmlDto>
+    </ticketDto>
+    <ticketDto>
         <category>STANDARD</category>
         <eventId>2</eventId>
         <id>1</id>
         <place>3</place>
         <userId>3</userId>
-    </ticketXmlDto>
-    <ticketXmlDto>
+    </ticketDto>
+    <ticketDto>
         <category>PREMIUM</category>
         <eventId>2</eventId>
         <id>2</id>
         <place>10</place>
         <userId>5</userId>
-    </ticketXmlDto>
-    <ticketXmlDto>
+    </ticketDto>
+    <ticketDto>
         <category>STANDARD</category>
         <eventId>4</eventId>
         <id>3</id>
         <place>15</place>
         <userId>3</userId>
-    </ticketXmlDto>
-    <ticketXmlDto>
+    </ticketDto>
+    <ticketDto>
         <category>STANDARD</category>
         <eventId>4</eventId>
         <id>4</id>
         <place>12</place>
         <userId>6</userId>
-    </ticketXmlDto>
-    <ticketXmlDto>
+    </ticketDto>
+    <ticketDto>
         <category>STANDARD</category>
         <eventId>5</eventId>
         <id>5</id>
         <place>11</place>
         <userId>0</userId>
-    </ticketXmlDto>
-    <ticketXmlDto>
+    </ticketDto>
+    <ticketDto>
         <category>PREMIUM</category>
         <eventId>5</eventId>
         <id>6</id>
         <place>8</place>
         <userId>6</userId>
-    </ticketXmlDto>
-    <ticketXmlDto>
+    </ticketDto>
+    <ticketDto>
         <category>STANDARD</category>
         <eventId>0</eventId>
         <id>7</id>
         <place>1</place>
         <userId>0</userId>
-    </ticketXmlDto>
-</ticketXmlDtoList>
+    </ticketDto>
+</ticketDtoList>

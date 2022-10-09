@@ -1,6 +1,6 @@
 package com.rntgroup.service;
 
-import static java.util.Calendar.SEPTEMBER;
+import static com.rntgroup.TestDataUtil.DEFAULT_PAGE_REQUEST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.rntgroup.TestDataUtil;
-import com.rntgroup.TestUtil;
 import com.rntgroup.exception.NotFoundException;
 import com.rntgroup.model.Event;
 import com.rntgroup.repository.EventRepository;
@@ -21,11 +20,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -83,30 +80,28 @@ class EventServiceTest {
                 new Event().setTitle(title),
                 new Event().setTitle(title)
         );
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "title");
 
         when(eventRepository.findByTitle(any(String.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(events, pageRequest, events.size()));
+                .thenReturn(new PageImpl<>(events, DEFAULT_PAGE_REQUEST, events.size()));
 
-        assertEquals(events, eventService.findByTitle(title,  pageRequest.getPageSize(), pageRequest.getPageNumber()));
-        verify(eventRepository).findByTitle(title, pageRequest);
+        assertEquals(events, eventService.findByTitle(title, DEFAULT_PAGE_REQUEST));
+        verify(eventRepository).findByTitle(title, DEFAULT_PAGE_REQUEST);
     }
 
     @Test
     @DisplayName("Должен вернуть список, содержащий Events с одинаковыми датами с определённой страницы")
     void shouldReturnEventsByDate() {
-        Date date = TestUtil.createDate(2022, SEPTEMBER, 5);
+        LocalDate date = LocalDate.now();
         List<Event> events = List.of(
                 new Event().setDate(date),
                 new Event().setDate(date)
         );
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "date");
 
-        when(eventRepository.findByDate(any(Date.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(events, pageRequest, events.size()));
+        when(eventRepository.findByDate(any(LocalDate.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(events, DEFAULT_PAGE_REQUEST, events.size()));
 
-        assertEquals(events, eventService.findByDate(date, pageRequest.getPageSize(), pageRequest.getPageNumber()));
-        verify(eventRepository).findByDate(date, pageRequest);
+        assertEquals(events, eventService.findByDate(date, DEFAULT_PAGE_REQUEST));
+        verify(eventRepository).findByDate(date, DEFAULT_PAGE_REQUEST);
     }
 
     @Test
