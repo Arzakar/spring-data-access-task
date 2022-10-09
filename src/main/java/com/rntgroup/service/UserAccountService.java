@@ -32,6 +32,10 @@ public class UserAccountService {
         return userAccountRepository.save(userAccount);
     }
 
+    public UserAccount create(UserAccount userAccount) {
+        return userAccountRepository.save(userAccount);
+    }
+
     public UserAccount replenish(UUID userId, BigDecimal amount) {
         UserAccount userAccount = userAccountRepository.findByUserId(userId).orElseThrow();
         BigDecimal newAmount = userAccount.getAmount().add(amount);

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="2022-10-09--05-01" author="Stepan Klimashin" runOnChange="true">
+        <sql>
+            ALTER TABLE tickets ADD CONSTRAINT FK_TICKET_ON_EVENT FOREIGN KEY (event_id) REFERENCES events (id) ON DELETE CASCADE;
+        </sql>
+    </changeSet>
+
+    <changeSet id="2022-10-09--05-02" author="Stepan Klimashin" runOnChange="true">
+        <sql>
+            ALTER TABLE tickets ADD CONSTRAINT FK_TICKET_ON_USER FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
+        </sql>
+    </changeSet>
+
+    <changeSet id="2022-10-09--05-03" author="Stepan Klimashin" runOnChange="true">
+        <sql>
+            ALTER TABLE user_accounts ADD CONSTRAINT FK_USER_ACCOUNTS_ON_USER FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE;
+        </sql>
+    </changeSet>
+</databaseChangeLog>

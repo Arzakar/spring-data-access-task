@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="2022-10-09--01" author="Stepan Klimashin" runOnChange="true">
+        <sql splitStatements="true">
+            DROP TABLE IF EXISTS events CASCADE;
+        </sql>
+        <sql>
+            CREATE TABLE events (
+                id UUID PRIMARY KEY,
+                title VARCHAR(255) NOT NULL,
+                date date NOT NULL,
+                price DECIMAL NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+
+</databaseChangeLog>

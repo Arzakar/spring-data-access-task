@@ -9,6 +9,7 @@ import com.rntgroup.enumerate.Category;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
+import com.rntgroup.model.UserAccount;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -69,6 +70,17 @@ public class TestDataUtil {
 
     public UserDto getRandomUserDto(UUID id) {
         return getRandomUserDto().setId(id);
+    }
+
+    public UserAccount getRandomUserAccount() {
+        return new UserAccount()
+                .setAmount(getRandomPositiveBigDecimal(BigDecimal.valueOf(10000)));
+    }
+
+    public UserAccount getRandomUserAccount(User user) {
+        return new UserAccount()
+                .setUser(user)
+                .setAmount(getRandomPositiveBigDecimal(BigDecimal.valueOf(10000)));
     }
 
     public Ticket getRandomTicket() {

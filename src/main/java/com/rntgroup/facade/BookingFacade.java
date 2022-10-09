@@ -1,12 +1,10 @@
 package com.rntgroup.facade;
 
+import com.rntgroup.dto.DataDumpDto;
 import com.rntgroup.dto.EventDto;
 import com.rntgroup.dto.TicketDto;
 import com.rntgroup.dto.UserAccountDto;
 import com.rntgroup.dto.UserDto;
-import com.rntgroup.dto.EventDtoList;
-import com.rntgroup.dto.TicketDtoList;
-import com.rntgroup.dto.UserDtoList;
 import com.rntgroup.enumerate.Category;
 import com.rntgroup.mapper.EventMapper;
 import com.rntgroup.mapper.TicketMapper;
@@ -30,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-
+import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +37,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -61,7 +61,6 @@ public class BookingFacade {
 
     MarshallerWrapper marshallerWrapper;
 
-    //@Override
     public EventDto getEventById(UUID eventId) {
         log.info("Method {}#getEventById was called with param: eventId = {}", this.getClass().getSimpleName(), eventId);
 
@@ -69,7 +68,6 @@ public class BookingFacade {
         return eventMapper.toDto(event);
     }
 
-    //@Override
     public List<EventDto> getEventsByTitle(String title, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
         log.info("Method {}#getEventsByTitle was called with params: title = {}, pageSize = {}, pageNum = {}",
                 this.getClass().getSimpleName(), title, pageSize, pageNum);
@@ -81,7 +79,6 @@ public class BookingFacade {
                 .collect(Collectors.toList());
     }
 
-    //@Override
     public List<EventDto> getEventsForDay(LocalDate day, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
         log.info("Method {}#getEventsForDay was called with params: day = {}, pageSize = {}, pageNum = {}",
                 this.getClass().getSimpleName(), day, pageSize, pageNum);
@@ -93,7 +90,6 @@ public class BookingFacade {
                 .collect(Collectors.toList());
     }
 
-    //@Override
     public EventDto createEvent(EventDto event) {
         log.info("Method {}#createEvent was called with param: event = {}", this.getClass().getSimpleName(), event);
 
@@ -101,7 +97,6 @@ public class BookingFacade {
         return eventMapper.toDto(createdEvent);
     }
 
-    //@Override
     public EventDto updateEvent(EventDto event) {
         log.info("Method {}#updateEvent was called with param: event = {}", this.getClass().getSimpleName(), event);
 
@@ -109,14 +104,12 @@ public class BookingFacade {
         return eventMapper.toDto(updatedEvent);
     }
 
-    //@Override
     public boolean deleteEvent(UUID eventId) {
         log.info("Method {}#deleteEvent was called with param: eventId = {}", this.getClass().getSimpleName(), eventId);
 
         return eventService.deleteById(eventId);
     }
 
-    //@Override
     public UserDto getUserById(UUID userId) {
         log.info("Method {}#getUserById was called with param: userId = {}", this.getClass().getSimpleName(), userId);
 
@@ -124,7 +117,6 @@ public class BookingFacade {
         return userMapper.toDto(user);
     }
 
-    //@Override
     public UserDto getUserByEmail(String email) {
         log.info("Method {}#getUserByEmail was called with param: email = {}", this.getClass().getSimpleName(), email);
 
@@ -132,7 +124,6 @@ public class BookingFacade {
         return userMapper.toDto(user);
     }
 
-    //@Override
     public List<UserDto> getUsersByName(String name, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
         log.info("Method {}#getUsersByName was called with params: name = {}, pageSize = {}, pageNum = {}",
                 this.getClass().getSimpleName(), name, pageSize, pageNum);
@@ -144,7 +135,6 @@ public class BookingFacade {
                 .collect(Collectors.toList());
     }
 
-    //@Override
     public UserDto createUser(UserDto user) {
         log.info("Method {}#createUser was called with param: user = {}", this.getClass().getSimpleName(), user);
 
@@ -152,7 +142,6 @@ public class BookingFacade {
         return userMapper.toDto(createdUser);
     }
 
-    //@Override
     public UserDto updateUser(UserDto user) {
         log.info("Method {}#updateUser was called with param: user = {}", this.getClass().getSimpleName(), user);
 
@@ -160,14 +149,12 @@ public class BookingFacade {
         return userMapper.toDto(updatedUser);
     }
 
-    //@Override
     public boolean deleteUser(UUID userId) {
         log.info("Method {}#userId was called with param: userId = {}", this.getClass().getSimpleName(), userId);
 
         return userService.deleteById(userId);
     }
 
-    //@Override
     public TicketDto bookTicket(UUID userId, UUID eventId, int place, Category category) {
         log.info("Method {}#bookTicket was called with params: userId = {}, eventId = {}, place = {}, category = {}",
                 this.getClass().getSimpleName(), userId, eventId, place, category);
@@ -184,7 +171,6 @@ public class BookingFacade {
         return ticketMapper.toDto(bookedTicket);
     }
 
-    //@Override
     public List<TicketDto> getBookedTickets(UserDto userDto, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
         log.info("Method {}#getBookedTickets was called with params: userId = {}, pageSize = {}, pageNum = {}",
                 this.getClass().getSimpleName(), userDto.getId(), pageSize, pageNum);
@@ -196,7 +182,6 @@ public class BookingFacade {
                 .collect(Collectors.toList());
     }
 
-    //@Override
     public List<TicketDto> getBookedTickets(EventDto eventDto, int pageNum, int pageSize, Sort.Direction direction, String sortParam) {
         log.info("Method {}#getBookedTickets was called with params: eventId = {}, pageSize = {}, pageNum = {}",
                 this.getClass().getSimpleName(), eventDto.getId(), pageSize, pageNum);
@@ -208,45 +193,77 @@ public class BookingFacade {
                 .collect(Collectors.toList());
     }
 
-    //@Override
     public boolean cancelTicket(UUID ticketId) {
         log.info("Method {}#cancelTicket was called with param: ticketId = {}", this.getClass().getSimpleName(), ticketId);
 
         return ticketService.deleteById(ticketId);
     }
 
-    //@Override
     public UserAccountDto replenishAccount(UUID userId, BigDecimal amount) {
         UserAccount userAccount = userAccountService.replenish(userId, amount);
         return userAccountMapper.toDto(userAccount);
     }
 
+    @PostConstruct
     public void preloadTickets() throws IOException {
         Charset utf8 = StandardCharsets.UTF_8;
 
-        InputStream usersInputStream = new ByteArrayInputStream(
-                FileReader.readResourceAsString("init-data/users.xml").getBytes(utf8)
+        InputStream dumpStream = new ByteArrayInputStream(
+                FileReader.readResourceAsString("init-data/dump-data.xml").getBytes(utf8)
         );
-        UserDtoList users = marshallerWrapper.unmarshall(usersInputStream, UserDtoList.class);
-        users.getUsers().stream()
-                .map(userMapper::toModel)
-                .forEach(userService::create);
 
-        InputStream eventsInputStream = new ByteArrayInputStream(
-                FileReader.readResourceAsString("init-data/events.xml").getBytes(utf8)
-        );
-        EventDtoList events = marshallerWrapper.unmarshall(eventsInputStream, EventDtoList.class);
-        events.getEvents().stream()
-                .map(eventMapper::toModel)
-                .forEach(eventService::create);
+        DataDumpDto dumpDto = marshallerWrapper.unmarshall(dumpStream, DataDumpDto.class);
 
-        InputStream ticketsInputStream = new ByteArrayInputStream(
-                FileReader.readResourceAsString("init-data/tickets.xml").getBytes(utf8)
-        );
-        TicketDtoList tickets = marshallerWrapper.unmarshall(ticketsInputStream, TicketDtoList.class);
-        tickets.getTickets().stream()
-                .map(ticketMapper::toModel)
-                .forEach(ticketService::create);
+        List<EventDto> eventDtoList = dumpDto.getEventDtoList().getEvents().stream()
+                .sorted(Comparator.comparing(EventDto::getId))
+                .collect(Collectors.toUnmodifiableList());
+        List<EventDto> savedEventDtoList = new ArrayList<>();
+        eventDtoList.stream().forEachOrdered(eventDto -> savedEventDtoList.add(this.createEvent(eventDto)));
+
+        List<UserDto> userDtoList = dumpDto.getUserDtoList().getUsers().stream()
+                .sorted(Comparator.comparing(UserDto::getId))
+                .collect(Collectors.toUnmodifiableList());
+        List<UserDto> savedUserDtoList = new ArrayList<>();
+        userDtoList.stream().forEachOrdered(userDto -> savedUserDtoList.add(this.createUser(userDto)));
+
+        dumpDto.getUserAccountDtoList().getUserAccounts().stream().forEachOrdered(userAccountDto -> {
+            UUID prevUserId = userAccountDto.getUserId();
+
+            UserDto userWithPrevId = userDtoList.stream()
+                    .filter(userDto -> userDto.getId().equals(prevUserId))
+                    .findFirst()
+                    .orElseThrow();
+
+            int prevUserIdPos = userDtoList.indexOf(userWithPrevId);
+
+            UUID currentUserId = savedUserDtoList.get(prevUserIdPos).getId();
+
+            UserAccount userAccountForSave = userAccountMapper.toModel(userAccountDto.setUserId(currentUserId));
+            userAccountService.create(userAccountForSave);
+        });
+
+        dumpDto.getTicketDtoList().getTickets().stream().forEachOrdered(ticketDto -> {
+            UUID prevUserId = ticketDto.getUserId();
+            UUID prevEventId = ticketDto.getEventId();
+
+            UserDto userWithPrevId = userDtoList.stream()
+                    .filter(userDto -> userDto.getId().equals(prevUserId))
+                    .findFirst()
+                    .orElseThrow();
+            EventDto eventWithPrevId = eventDtoList.stream()
+                    .filter(eventDto -> eventDto.getId().equals(prevEventId))
+                    .findFirst()
+                    .orElseThrow();
+
+            int prevUserIdPos = userDtoList.indexOf(userWithPrevId);
+            int prevEventIdPos = eventDtoList.indexOf(eventWithPrevId);
+
+            UUID currentUserId = savedUserDtoList.get(prevUserIdPos).getId();
+            UUID currentEventId = savedEventDtoList.get(prevEventIdPos).getId();
+
+            Ticket ticketForSave = ticketMapper.toModel(ticketDto.setUserId(currentUserId).setEventId(currentEventId));
+            ticketService.create(ticketForSave);
+        });
     }
 
     private int pageNumOffset(int pageNum) {

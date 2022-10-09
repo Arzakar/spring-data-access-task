@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="2022-10-09--03" author="Stepan Klimashin" runOnChange="true">
+        <sql splitStatements="true">
+            DROP TABLE IF EXISTS tickets CASCADE;
+        </sql>
+        <sql>
+            CREATE TABLE tickets (
+                id UUID PRIMARY KEY,
+                event_id UUID NOT NULL,
+                user_id UUID NOT NULL,
+                category VARCHAR(255) NOT NULL,
+                place INTEGER NOT NULL
+            );
+        </sql>
+    </changeSet>
+</databaseChangeLog>

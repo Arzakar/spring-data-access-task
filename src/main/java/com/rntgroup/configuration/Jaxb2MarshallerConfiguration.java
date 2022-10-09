@@ -1,7 +1,10 @@
 package com.rntgroup.configuration;
 
+import com.rntgroup.dto.DataDumpDto;
 import com.rntgroup.dto.EventDto;
 import com.rntgroup.dto.TicketDto;
+import com.rntgroup.dto.UserAccountDto;
+import com.rntgroup.dto.UserAccountDtoList;
 import com.rntgroup.dto.UserDto;
 import com.rntgroup.dto.EventDtoList;
 import com.rntgroup.dto.TicketDtoList;
@@ -24,6 +27,9 @@ public class Jaxb2MarshallerConfiguration {
                 TicketDtoList.class,
                 UserDto.class,
                 UserDtoList.class,
+                UserAccountDto.class,
+                UserAccountDtoList.class,
+                DataDumpDto.class,
                 Category.class
         );
         return jaxb2Marshaller;

@@ -11,6 +11,6 @@ spring:
     password: postgres
     driver-class-name: org.postgresql.Driver
 
-  jpa:
-    hibernate:
-      ddl-auto: create
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog-master.xml
