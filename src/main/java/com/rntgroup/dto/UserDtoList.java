@@ -14,7 +14,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserDtoList {
 
-    @XmlElement(name = "userXmlDto", type = UserDto.class)
+    @XmlElement(name = "userDto", type = UserDto.class)
     List<UserDto> users = new ArrayList<>();
 
 }

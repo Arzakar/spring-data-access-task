@@ -53,15 +53,23 @@ public class TicketController {
                                          @RequestParam(name = "direction", required = false, defaultValue = "ASC") Sort.Direction direction,
                                          @RequestParam(name = "sortParam", required = false, defaultValue = "id") String sortParam) {
 
-        if (Objects.nonNull(userId) && Objects.nonNull(eventId)) {
-            throw new BadRequestException("Ошибка в запросе: userId и eventId не могут задаваться одновременно");
+        boolean userIdIsNull = Objects.isNull(userId);
+        boolean eventIdIsNull = Objects.isNull(eventId);
+
+        List<Boolean> requestParamsNullableFlags = List.of(
+                userIdIsNull,
+                eventIdIsNull
+        );
+
+        long notNullParamsCount = requestParamsNullableFlags.stream()
+                .filter(value -> value.equals(Boolean.FALSE))
+                .count();
+
+        if (notNullParamsCount != 1) {
+            throw new BadRequestException("Ошибка в запросе: указано неверное количество параметров поиска");
         }
 
-        if (Objects.isNull(userId) && Objects.isNull(eventId)) {
-            throw new NotImplementedException("Метод получения всех билетов не реализован");
-        }
-
-        if (Objects.nonNull(userId)) {
+        if (!userIdIsNull) {
             return bookingFacade.getBookedTickets(bookingFacade.getUserById(userId), pageNum, pageSize, direction, sortParam);
         }
 

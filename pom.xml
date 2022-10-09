@@ -30,6 +30,7 @@
 <!--        <junit.version>5.8.2</junit.version>-->
 <!--        <junit.platform-launcher.version>1.8.2</junit.platform-launcher.version>-->
 <!--        <mockito.junit-jupiter.version>4.6.1</mockito.junit-jupiter.version>-->
+        <testconteiners.version>1.17.5</testconteiners.version>
         <jacoco.version>0.8.8</jacoco.version>
 
 <!--        <jackson.version>2.13.3</jackson.version>-->
@@ -43,6 +44,18 @@
 
 <!--        <snakeyaml.version>1.30</snakeyaml.version>-->
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>1.17.5</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Spring Framework -->
@@ -96,6 +109,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testconteiners.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jeasy</groupId>

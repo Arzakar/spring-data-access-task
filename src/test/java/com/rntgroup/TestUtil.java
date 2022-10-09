@@ -1,6 +1,7 @@
 package com.rntgroup;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
@@ -13,6 +14,8 @@ import java.util.Date;
 @UtilityClass
 public class TestUtil {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
     @SneakyThrows
     public String readResourceAsString(String filePath) {
         return Files.readString(new ClassPathResource(filePath).getFile().toPath());
@@ -24,7 +27,6 @@ public class TestUtil {
 
     @SneakyThrows
     public <T> T deepCopy(T object) {
-        ObjectMapper objectMapper = new ObjectMapper();
         return (T) objectMapper.readValue(objectMapper.writeValueAsString(object), object.getClass());
     }
 

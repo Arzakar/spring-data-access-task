@@ -1,5 +1,6 @@
 package com.rntgroup.service;
 
+import static com.rntgroup.TestDataUtil.DEFAULT_PAGE_REQUEST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.rntgroup.TestDataUtil;
 import com.rntgroup.exception.BadRequestException;
+import com.rntgroup.exception.ValidationException;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
@@ -22,9 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,11 +59,11 @@ class TicketServiceTest {
         Event event = TestDataUtil.getRandomEvent(UUID.randomUUID());
         Ticket ticket = TestDataUtil.getRandomTicket().setEvent(event);
 
-        BadRequestException expectedException = new BadRequestException(String.format("Ticket with place = %d already exist", ticket.getPlace()));
+        ValidationException expectedException = new ValidationException(String.format("Ticket with place = %d already exist", ticket.getPlace()));
 
         when(ticketRepository.findByEventIdAndPlace(any(UUID.class), any(Integer.class))).thenReturn(Optional.of(ticket));
 
-        BadRequestException thrown = assertThrows(BadRequestException.class, () -> ticketService.create(ticket));
+        ValidationException thrown = assertThrows(ValidationException.class, () -> ticketService.create(ticket));
         assertEquals(expectedException.getMessage(), thrown.getMessage());
         verify(ticketRepository).findByEventIdAndPlace(event.getId(), ticket.getPlace());
         verify(ticketRepository, never()).save(ticket);
@@ -77,13 +77,12 @@ class TicketServiceTest {
                 TestDataUtil.getRandomTicket().setEvent(event),
                 TestDataUtil.getRandomTicket().setEvent(event)
         );
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "user");
 
         when(ticketRepository.findByEventId(any(UUID.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(tickets, pageRequest, tickets.size()));
+                .thenReturn(new PageImpl<>(tickets, DEFAULT_PAGE_REQUEST, tickets.size()));
 
-        assertEquals(tickets, ticketService.findByEventId(event.getId(), pageRequest.getPageSize(), pageRequest.getPageNumber()));
-        verify(ticketRepository).findByEventId(event.getId(), pageRequest);
+        assertEquals(tickets, ticketService.findByEventId(event.getId(), DEFAULT_PAGE_REQUEST));
+        verify(ticketRepository).findByEventId(event.getId(), DEFAULT_PAGE_REQUEST);
     }
 
     @Test
@@ -95,13 +94,11 @@ class TicketServiceTest {
                 TestDataUtil.getRandomTicket().setUser(user)
         );
 
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.Direction.ASC, "event");
-
         when(ticketRepository.findByUserId(any(UUID.class), any(Pageable.class)))
-                .thenReturn(new PageImpl<>(tickets, pageRequest, tickets.size()));
+                .thenReturn(new PageImpl<>(tickets, DEFAULT_PAGE_REQUEST, tickets.size()));
 
-        assertEquals(tickets, ticketService.findByUserId(user.getId(), pageRequest.getPageSize(), pageRequest.getPageNumber()));
-        verify(ticketRepository).findByUserId(user.getId(), pageRequest);
+        assertEquals(tickets, ticketService.findByUserId(user.getId(), DEFAULT_PAGE_REQUEST));
+        verify(ticketRepository).findByUserId(user.getId(), DEFAULT_PAGE_REQUEST);
     }
 
     @Test

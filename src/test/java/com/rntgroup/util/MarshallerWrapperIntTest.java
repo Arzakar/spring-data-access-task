@@ -1,7 +1,7 @@
 package com.rntgroup.util;
 
-import com.rntgroup.dto.xml.UserXmlDto;
-import org.jeasy.random.EasyRandom;
+import com.rntgroup.TestDataUtil;
+import com.rntgroup.dto.UserDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,13 +24,13 @@ class MarshallerWrapperIntTest {
     @Test
     @DisplayName("Объект успешно переведён в XML")
     void shouldMarshallObject() {
-        UserXmlDto user = new EasyRandom().nextObject(UserXmlDto.class);
+        UserDto user = TestDataUtil.getRandomUserDto(UUID.randomUUID());
         String expectedXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                + "<userXmlDto>"
+                + "<userDto>"
                 + "<email>" + user.getEmail() + "</email>"
                 + "<id>" + user.getId() + "</id>"
                 + "<name>" + user.getName() + "</name>"
-                + "</userXmlDto>";
+                + "</userDto>";
 
         assertEquals(expectedXml, marshallerWrapper.marshall(user));
     }
@@ -37,15 +38,15 @@ class MarshallerWrapperIntTest {
     @Test
     @DisplayName("Объект успешно создан из XML")
     void shouldUnmarshallXml() {
-        UserXmlDto user = new EasyRandom().nextObject(UserXmlDto.class);
+        UserDto user = TestDataUtil.getRandomUserDto(UUID.randomUUID());
         String userAsXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-                + "<userXmlDto>"
+                + "<userDto>"
                 + "<email>" + user.getEmail() + "</email>"
                 + "<id>" + user.getId() + "</id>"
                 + "<name>" + user.getName() + "</name>"
-                + "</userXmlDto>";
+                + "</userDto>";
 
-        assertEquals(user, marshallerWrapper.unmarshall(new ByteArrayInputStream(userAsXml.getBytes(StandardCharsets.UTF_8)), UserXmlDto.class));
+        assertEquals(user, marshallerWrapper.unmarshall(new ByteArrayInputStream(userAsXml.getBytes(StandardCharsets.UTF_8)), UserDto.class));
     }
 
 }
