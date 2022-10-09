@@ -214,6 +214,7 @@ public class BookingFacade {
         return userAccountMapper.toDto(userAccount);
     }
 
+    @PostConstruct
     public void preloadTickets() throws IOException {
         Charset utf8 = StandardCharsets.UTF_8;
 

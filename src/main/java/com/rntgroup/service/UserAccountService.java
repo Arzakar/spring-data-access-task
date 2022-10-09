@@ -33,8 +33,11 @@ public class UserAccountService {
     }
 
     public UserAccount create(UserAccount userAccount) {
-        UUID userId = userAccount.getUser().getId();
-        return create(userId);
+        if (userAccountRepository.findByUserId(userAccount.getUser().getId()).isPresent()) {
+            throw new ValidationException(String.format("У клиента с id = %s уже есть счёт", userAccount.getUser().getId()));
+        }
+
+        return userAccountRepository.save(userAccount);
     }
 
     public UserAccount replenish(UUID userId, BigDecimal amount) {
