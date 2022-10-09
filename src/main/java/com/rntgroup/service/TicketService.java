@@ -1,5 +1,6 @@
 package com.rntgroup.service;
 
+import com.rntgroup.exception.NotFoundException;
 import com.rntgroup.exception.ValidationException;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.repository.TicketRepository;
@@ -21,6 +22,10 @@ import java.util.UUID;
 public class TicketService {
 
     TicketRepository ticketRepository;
+
+    public Ticket findById(UUID id) {
+        return ticketRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Ticket with id = %s not found", id)));
+    }
 
     public Ticket create(Ticket ticket) {
         log.debug("Method {}#create was called with param: ticket = {}", this.getClass().getSimpleName(), ticket);

@@ -49,6 +49,11 @@ public class UserAccountService {
 
     public UserAccount withdraw(UUID userId, BigDecimal amount) {
         UserAccount userAccount = userAccountRepository.findByUserId(userId).orElseThrow();
+
+        if(userAccount.getAmount().compareTo(amount) < 0) {
+            throw new ValidationException(String.format("У клиента с id = %s недостаточно денег на счёте", userId));
+        }
+
         BigDecimal newAmount = userAccount.getAmount().subtract(amount);
 
         return userAccountRepository.save(userAccount.setAmount(newAmount));

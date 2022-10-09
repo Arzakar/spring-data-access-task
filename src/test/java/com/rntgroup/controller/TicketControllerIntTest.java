@@ -11,8 +11,10 @@ import com.rntgroup.mapper.TicketMapper;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
+import com.rntgroup.model.UserAccount;
 import com.rntgroup.repository.EventRepository;
 import com.rntgroup.repository.TicketRepository;
+import com.rntgroup.repository.UserAccountRepository;
 import com.rntgroup.repository.UserRepository;
 
 import lombok.SneakyThrows;
@@ -25,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -51,6 +54,9 @@ class TicketControllerIntTest {
     private UserRepository userRepository;
 
     @Autowired
+    private UserAccountRepository userAccountRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -58,6 +64,7 @@ class TicketControllerIntTest {
         ticketRepository.deleteAll();
         eventRepository.deleteAll();
         userRepository.deleteAll();
+        userAccountRepository.deleteAll();
     }
 
     @Test
@@ -65,6 +72,7 @@ class TicketControllerIntTest {
     void shouldBookTicket() {
         Event event = eventRepository.save(TestDataUtil.getRandomEvent());
         User user = userRepository.save(TestDataUtil.getRandomUser());
+        userAccountRepository.save(TestDataUtil.getRandomUserAccount(user).setAmount(BigDecimal.valueOf(10000)));
         TicketDto ticketForSaveDto = TestDataUtil.getRandomBookedTicketDto(event.getId(), user.getId());
 
         var result = mockMvc.perform(MockMvcRequestBuilders
@@ -91,9 +99,7 @@ class TicketControllerIntTest {
         }
 
         List<Ticket> tickets = new ArrayList<>();
-        users.forEach(user -> {
-            tickets.add(ticketRepository.save(TestDataUtil.getRandomBookedTicket(event, user)));
-        });
+        users.forEach(user -> tickets.add(ticketRepository.save(TestDataUtil.getRandomBookedTicket(event, user))));
 
         List<TicketDto> ticketDtoList = tickets.stream()
                 .map(ticketMapper::toDto)
@@ -117,9 +123,7 @@ class TicketControllerIntTest {
         User user = userRepository.save(TestDataUtil.getRandomUser());
 
         List<Ticket> tickets = new ArrayList<>();
-        events.forEach(event -> {
-            tickets.add(ticketRepository.save(TestDataUtil.getRandomBookedTicket(event, user)));
-        });
+        events.forEach(event -> tickets.add(ticketRepository.save(TestDataUtil.getRandomBookedTicket(event, user))));
 
         List<TicketDto> ticketDtoList = tickets.stream()
                 .map(ticketMapper::toDto)
@@ -137,6 +141,7 @@ class TicketControllerIntTest {
     void shouldCancelTicket() {
         Event event = eventRepository.save(TestDataUtil.getRandomEvent());
         User user = userRepository.save(TestDataUtil.getRandomUser());
+        userAccountRepository.save(TestDataUtil.getRandomUserAccount(user).setAmount(BigDecimal.valueOf(10000)));
         Ticket ticket = ticketRepository.save(TestDataUtil.getRandomBookedTicket(event, user));
 
         mockMvc.perform(MockMvcRequestBuilders

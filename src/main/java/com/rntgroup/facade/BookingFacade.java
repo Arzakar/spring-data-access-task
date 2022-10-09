@@ -165,12 +165,16 @@ public class BookingFacade {
         return userService.deleteById(userId);
     }
 
+    @Transactional
     public TicketDto bookTicket(UUID userId, UUID eventId, int place, Category category) {
         log.info("Method {}#bookTicket was called with params: userId = {}, eventId = {}, place = {}, category = {}",
                 this.getClass().getSimpleName(), userId, eventId, place, category);
 
         Event event = eventService.findById(eventId);
         User user = userService.findById(userId);
+
+        userAccountService.withdraw(user.getId(), event.getPrice());
+
         Ticket bookedTicket = ticketService.create(
                 new Ticket().setEvent(event)
                         .setUser(user)
@@ -206,6 +210,11 @@ public class BookingFacade {
     public boolean cancelTicket(UUID ticketId) {
         log.info("Method {}#cancelTicket was called with param: ticketId = {}", this.getClass().getSimpleName(), ticketId);
 
+        Ticket ticket = ticketService.findById(ticketId);
+        UUID userid = ticket.getUser().getId();
+        BigDecimal eventPrice = ticket.getEvent().getPrice();
+
+        this.replenishAccount(userid, eventPrice);
         return ticketService.deleteById(ticketId);
     }
 
@@ -214,7 +223,6 @@ public class BookingFacade {
         return userAccountMapper.toDto(userAccount);
     }
 
-    @PostConstruct
     public void preloadTickets() throws IOException {
         Charset utf8 = StandardCharsets.UTF_8;
 

@@ -5,10 +5,10 @@ import com.rntgroup.model.Event;
 import org.mapstruct.Mapper;
 
 @Mapper
-public abstract class EventMapper {
+public interface EventMapper {
 
-    public abstract Event toModel(EventDto eventDto);
+    Event toModel(EventDto eventDto);
 
-    public abstract EventDto toDto(Event event);
+    EventDto toDto(Event event);
 
 }
