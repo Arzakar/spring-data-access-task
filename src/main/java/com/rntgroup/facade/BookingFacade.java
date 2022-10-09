@@ -28,6 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -135,9 +137,17 @@ public class BookingFacade {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public UserDto createUser(UserDto user) {
         log.info("Method {}#createUser was called with param: user = {}", this.getClass().getSimpleName(), user);
 
+        User createdUser = userService.create(userMapper.toModel(user));
+        UserAccount userAccount = userAccountService.create(createdUser.getId());
+
+        return userMapper.toDto(createdUser.setAccount(userAccount));
+    }
+
+    private UserDto createUserWithoutAccount(UserDto user) {
         User createdUser = userService.create(userMapper.toModel(user));
         return userMapper.toDto(createdUser);
     }
@@ -204,7 +214,6 @@ public class BookingFacade {
         return userAccountMapper.toDto(userAccount);
     }
 
-    @PostConstruct
     public void preloadTickets() throws IOException {
         Charset utf8 = StandardCharsets.UTF_8;
 
@@ -224,7 +233,7 @@ public class BookingFacade {
                 .sorted(Comparator.comparing(UserDto::getId))
                 .collect(Collectors.toUnmodifiableList());
         List<UserDto> savedUserDtoList = new ArrayList<>();
-        userDtoList.stream().forEachOrdered(userDto -> savedUserDtoList.add(this.createUser(userDto)));
+        userDtoList.stream().forEachOrdered(userDto -> savedUserDtoList.add(this.createUserWithoutAccount(userDto)));
 
         dumpDto.getUserAccountDtoList().getUserAccounts().stream().forEachOrdered(userAccountDto -> {
             UUID prevUserId = userAccountDto.getUserId();

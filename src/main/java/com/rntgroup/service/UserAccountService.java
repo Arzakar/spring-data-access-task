@@ -22,7 +22,7 @@ public class UserAccountService {
     UserService userService;
 
     public UserAccount create(UUID userId) {
-        if (userAccountRepository.findByUserId(userId).isEmpty()) {
+        if (userAccountRepository.findByUserId(userId).isPresent()) {
             throw new ValidationException(String.format("У клиента с id = %s уже есть счёт", userId));
         }
 
@@ -33,7 +33,8 @@ public class UserAccountService {
     }
 
     public UserAccount create(UserAccount userAccount) {
-        return userAccountRepository.save(userAccount);
+        UUID userId = userAccount.getUser().getId();
+        return create(userId);
     }
 
     public UserAccount replenish(UUID userId, BigDecimal amount) {

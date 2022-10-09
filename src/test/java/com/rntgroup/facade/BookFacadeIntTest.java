@@ -18,6 +18,7 @@ import com.rntgroup.mapper.UserMapper;
 
 import com.rntgroup.repository.EventRepository;
 import com.rntgroup.repository.TicketRepository;
+import com.rntgroup.repository.UserAccountRepository;
 import com.rntgroup.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,10 +56,14 @@ class BookFacadeIntTest {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private UserAccountRepository userAccountRepository;
+
     @BeforeEach
     void setUp() {
         eventRepository.deleteAll();
         userRepository.deleteAll();
+        userAccountRepository.deleteAll();
         ticketRepository.deleteAll();
     }
 
@@ -74,6 +79,7 @@ class BookFacadeIntTest {
         UserDto userDto = bookingFacade.createUser(TestDataUtil.getRandomUserDto());
         assertEquals(userMapper.toModel(userDto), userRepository.findById(userDto.getId()).orElseThrow());
         assertEquals(1, userRepository.findAll().size());
+        assertEquals(1, userAccountRepository.findAll().size());
 
         // бронирование билета
         TicketDto bookedTicketDto = bookingFacade.bookTicket(userDto.getId(), eventDto.getId(), 5, Category.BAR);
@@ -93,6 +99,7 @@ class BookFacadeIntTest {
         UserDto userDto = bookingFacade.createUser(TestDataUtil.getRandomUserDto());
         assertEquals(userMapper.toModel(userDto), userRepository.findById(userDto.getId()).orElseThrow());
         assertEquals(1, userRepository.findAll().size());
+        assertEquals(1, userAccountRepository.findAll().size());
 
         // бронирование первого билета
         TicketDto firstBookedTicketDto = bookingFacade.bookTicket(userDto.getId(), eventDto.getId(), 5, Category.BAR);
@@ -122,6 +129,7 @@ class BookFacadeIntTest {
         UserDto userDto = bookingFacade.createUser(TestDataUtil.getRandomUserDto());
         assertEquals(userMapper.toModel(userDto), userRepository.findById(userDto.getId()).orElseThrow());
         assertEquals(1, userRepository.findAll().size());
+        assertEquals(1, userAccountRepository.findAll().size());
 
         // бронирование первого билета
         TicketDto firstBookedTicketDto = bookingFacade.bookTicket(userDto.getId(), eventDto.getId(), 5, Category.BAR);

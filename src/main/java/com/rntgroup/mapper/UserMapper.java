@@ -3,12 +3,14 @@ package com.rntgroup.mapper;
 import com.rntgroup.dto.UserDto;
 import com.rntgroup.model.User;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper
-public abstract class UserMapper {
+public interface UserMapper {
 
-    public abstract User toModel(UserDto userDto);
+    User toModel(UserDto userDto);
 
-    public abstract UserDto toDto(User user);
+    @Mapping(target = "userAccountId", source = "account.id")
+    UserDto toDto(User user);
 
 }
