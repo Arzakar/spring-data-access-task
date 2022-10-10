@@ -11,14 +11,13 @@ import com.rntgroup.mapper.TicketMapper;
 import com.rntgroup.model.Event;
 import com.rntgroup.model.Ticket;
 import com.rntgroup.model.User;
-import com.rntgroup.model.UserAccount;
 import com.rntgroup.repository.EventRepository;
 import com.rntgroup.repository.TicketRepository;
 import com.rntgroup.repository.UserAccountRepository;
 import com.rntgroup.repository.UserRepository;
 
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -59,12 +58,12 @@ class TicketControllerIntTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setUp() {
+    @AfterEach
+    void clear() {
         ticketRepository.deleteAll();
+        userAccountRepository.deleteAll();
         eventRepository.deleteAll();
         userRepository.deleteAll();
-        userAccountRepository.deleteAll();
     }
 
     @Test

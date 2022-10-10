@@ -2,7 +2,6 @@ package com.rntgroup.controller;
 
 import com.rntgroup.dto.TicketDto;
 import com.rntgroup.exception.BadRequestException;
-import com.rntgroup.exception.NotImplementedException;
 import com.rntgroup.facade.BookingFacade;
 
 import lombok.AccessLevel;

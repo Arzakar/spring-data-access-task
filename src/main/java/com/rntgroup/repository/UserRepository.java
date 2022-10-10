@@ -5,13 +5,21 @@ import com.rntgroup.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.QueryHint;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.hibernate.jpa.QueryHints.HINT_CACHEABLE;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
+
+    @QueryHints(@QueryHint(name = HINT_CACHEABLE, value = "true"))
+    Optional<User> findById(@NonNull UUID id);
 
     Page<User> findByName(String name, Pageable pageable);
 

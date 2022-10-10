@@ -8,6 +8,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -21,6 +23,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "user_accounts")
+@Cache(region = "userAccounts", usage = CacheConcurrencyStrategy.READ_WRITE)
 @Getter
 @Setter
 @ToString
