@@ -77,6 +77,11 @@
             <artifactId>jacoco-maven-plugin</artifactId>
             <version>${jacoco.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.17.5</version>
+        </dependency>
 
         <!-- Lombok & Mapstruct -->
         <dependency>
